@@ -68,6 +68,10 @@
           <i class="fa-solid fa-clipboard-user axg-nav-icon"></i>
           <span>Gym Attendance</span>
         </a>
+        <a href="#registrationQrSection" class="axg-nav-link" id="navRegistrationQr">
+          <i class="fa-solid fa-qrcode axg-nav-icon"></i>
+          <span>Registration QR</span>
+        </a>
         <a href="#settings" class="axg-nav-link" id="navSettings">
           <i class="fa-solid fa-sliders axg-nav-icon"></i>
           <span>Settings</span>
@@ -261,14 +265,13 @@
             <table class="axg-table" id="clientTable">
               <thead>
                 <tr>
-                  <th>Client</th>
-                  <th>WhatsApp</th>
-                  <th>Start Weight</th>
-                  <th>Current Weight</th>
-                  <th>Change</th>
-                  <th>Day</th>
-                  <th>Progress</th>
+                  <th style="width:52px; text-align:center;">Photo</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Weight</th>
                   <th>Status</th>
+                  <th>Joined Date</th>
+                  <th>Progress</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -669,6 +672,115 @@
 
         </section>
 
+        <!-- ==============================================
+             CLIENT REGISTRATION QR SECTION (PART 3)
+        ============================================== -->
+        <section class="axg-section" id="registrationQrSection" aria-label="Client Registration QR" style="margin-top: 40px;">
+          <!-- Section Top Header -->
+          <div class="axg-section-header">
+            <div class="axg-section-header__title-group">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span class="axg-badge" style="font-size: 10px; padding: 2px 8px; background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3);">
+                  <i class="fa-solid fa-user-plus"></i> NEW CLIENT ONBOARDING
+                </span>
+                <span class="axg-badge" style="font-size: 10px; padding: 2px 8px; background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">
+                  <i class="fa-solid fa-infinity"></i> PERMANENT QR
+                </span>
+              </div>
+              <h2 class="axg-section-title">
+                <i class="fa-solid fa-qrcode" style="color: var(--red);"></i> CLIENT REGISTRATION QR
+              </h2>
+              <p class="axg-section-subtitle">
+                Permanent reception QR code for new member registration. Clients scan with their phone, sign in with Google, enter starting weight, and sync into your dashboard.
+              </p>
+            </div>
+            <div class="axg-section-header__actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="axg-btn axg-btn--primary" id="adminRegBtnLaunchKiosk">
+                <i class="fa-solid fa-tv"></i>
+                <span>Launch Reception Kiosk</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dual-Card QR Studio Layout -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 16px;">
+            <!-- Left Card: Live QR Display -->
+            <div style="background: var(--surface-1); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+              <div style="font-family: var(--font-brand); font-size: 18px; font-weight: 800; margin-bottom: 6px; color: var(--text-pure);">
+                ALPHA <span style="color: var(--red);">X</span> GYM
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;" id="adminRegGymNameBadge">
+                Alpha X Gym — Main Facility
+              </div>
+
+              <!-- High Contrast QR Code Frame -->
+              <div style="background: #ffffff; padding: 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; margin-bottom: 20px;">
+                <img id="adminRegQrImg" style="width: 240px; height: 240px; display: block; border-radius: 4px;" alt="Client Registration QR" src="https://api.qrserver.com/v1/create-qr-code/?size=500x500&amp;margin=10&amp;data=https%3A%2F%2Fdc07ca2e087e5d.lhr.life%2Fregister" />
+                <div id="adminRegQrLoading" style="display: none; position: absolute; inset: 0; background: rgba(15,17,23,0.92); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--red);"></i>
+                  <span style="font-size: 12px; color: var(--text-muted);">Generating QR...</span>
+                </div>
+              </div>
+
+              <div style="font-family: var(--font-brand); font-size: 16px; font-weight: 800; color: var(--text-pure); letter-spacing: 0.04em;">
+                SCAN TO JOIN ALPHA X GYM
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; max-width: 280px;">
+                Point phone camera to create client profile and record initial weight benchmark.
+              </div>
+            </div>
+
+            <!-- Right Card: Controls & Settings -->
+            <div style="background: var(--surface-1); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px;">
+              <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text-pure); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-sliders" style="color: var(--red);"></i> Registration Link &amp; Actions
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                  This is your gym's permanent public onboarding URL. You can share this link on WhatsApp, print it for physical gym posters, or display it on a tablet at your reception counter.
+                </p>
+
+                <!-- URL Field with Copy Button -->
+                <label class="axg-label" style="display: block; margin-bottom: 6px;">
+                  <i class="fa-solid fa-link"></i> Public Member Registration URL:
+                </label>
+                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                  <input type="text" id="adminRegUrlInput" class="axg-input" readonly value="https://dc07ca2e087e5d.lhr.life/register" style="font-family: monospace; font-size: 12px;" />
+                  <button type="button" class="axg-btn axg-btn--ghost" id="adminRegBtnCopy" title="Copy URL">
+                    <i class="fa-solid fa-copy"></i> Copy
+                  </button>
+                </div>
+
+                <!-- Action Button Row -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                  <button type="button" class="axg-btn axg-btn--primary" id="adminRegBtnDownload">
+                    <i class="fa-solid fa-download"></i> Download PNG
+                  </button>
+                  <button type="button" class="axg-btn axg-btn--ghost" id="adminRegBtnPrint">
+                    <i class="fa-solid fa-print"></i> Print Poster
+                  </button>
+                  <a href="https://dc07ca2e087e5d.lhr.life/register" target="_blank" class="axg-btn axg-btn--ghost" id="adminRegBtnOpenPage" style="text-decoration: none; justify-content: center; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Page
+                  </a>
+                </div>
+              </div>
+
+              <!-- Quick Verification Checklist -->
+              <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                  <i class="fa-solid fa-shield-halved" style="color: var(--red);"></i> Registration Security Guardrails
+                </div>
+                <ul style="list-style: none; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px; padding: 0; margin: 0;">
+                  <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 6px;"></i> <strong>One Google ID = One Client Profile:</strong> Prevents duplicate records.</li>
+                  <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 6px;"></i> <strong>Starting Weight Benchmark:</strong> Creates immutable first weigh-in record.</li>
+                  <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 6px;"></i> <strong>Instant Admin Visibility:</strong> Newly registered clients appear in your roster immediately.</li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -776,14 +888,23 @@
 
       <div class="axg-modal__header">
         <div class="axg-modal__header-client">
-          <div class="axg-client-avatar-badge">
-            <i class="fa-solid fa-dumbbell"></i>
+          <div class="axg-client-avatar-badge" id="detailClientAvatarWrap" style="overflow:hidden; width:52px; height:52px; border-radius:50%; border:2px solid var(--red); display:flex; align-items:center; justify-content:center; background:var(--surface-3); flex-shrink:0;">
+            <i class="fa-solid fa-dumbbell" id="detailClientAvatarFallback" style="font-size:22px; color:var(--red);"></i>
+            <img id="detailClientAvatarImg" src="" alt="Client Photo" style="display:none; width:100%; height:100%; object-fit:cover;" />
           </div>
           <div>
-            <h2 class="axg-modal__title" id="detailClientName">Client Name</h2>
-            <span class="axg-detail-phone" id="detailClientPhone">
-              <i class="fa-brands fa-whatsapp"></i> No phone added
-            </span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <h2 class="axg-modal__title" id="detailClientName">Client Name</h2>
+              <span class="axg-badge axg-badge--active" id="detailMembershipStatus" style="font-size:0.75rem; padding:2px 8px;">ACTIVE</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:4px;">
+              <span class="axg-detail-phone" id="detailClientPhone">
+                <i class="fa-brands fa-whatsapp"></i> No phone added
+              </span>
+              <span class="axg-detail-email" id="detailClientEmail" style="color:var(--text-muted); font-size:0.85rem; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-shield-halved" style="color:#22c55e;"></i> <span id="detailClientEmailText">—</span>
+              </span>
+            </div>
           </div>
         </div>
         <div class="axg-modal__header-controls">
@@ -800,13 +921,13 @@
         <!-- Challenge Timeline Summary -->
         <div class="axg-detail-summary">
           <div class="axg-detail-stat">
-            <span class="axg-detail-stat__label"><i class="fa-regular fa-calendar"></i> Start Date</span>
-            <span class="axg-detail-stat__value" id="detailStartDate">—</span>
+            <span class="axg-detail-stat__label"><i class="fa-regular fa-calendar-check"></i> Registration Date</span>
+            <span class="axg-detail-stat__value" id="detailRegisteredDate">—</span>
           </div>
 
           <div class="axg-detail-stat">
-            <span class="axg-detail-stat__label"><i class="fa-solid fa-flag-checkered"></i> End Date</span>
-            <span class="axg-detail-stat__value" id="detailEndDate">—</span>
+            <span class="axg-detail-stat__label"><i class="fa-regular fa-calendar"></i> Start Date</span>
+            <span class="axg-detail-stat__value" id="detailStartDate">—</span>
           </div>
 
           <div class="axg-detail-stat">
@@ -815,8 +936,8 @@
           </div>
 
           <div class="axg-detail-stat">
-            <span class="axg-detail-stat__label"><i class="fa-solid fa-circle-dot"></i> Status</span>
-            <span class="axg-detail-stat__value" id="detailStatus">—</span>
+            <span class="axg-detail-stat__label"><i class="fa-solid fa-percent"></i> Attendance Rate</span>
+            <span class="axg-detail-stat__value" id="detailAttendanceRate" style="color:var(--green);">—</span>
           </div>
         </div>
 
@@ -897,25 +1018,31 @@
             <i class="fa-solid fa-calendar-days"></i> Daily Attendance & Workout Tracking
           </h3>
 
-          <!-- 5 Attendance Stat Cards -->
+          <!-- 6 Attendance & Workout Stat Cards -->
           <div class="axg-attendance-stats">
 
             <div class="axg-att-stat axg-att-stat--completed">
               <span class="axg-att-stat__icon"><i class="fa-solid fa-circle-check"></i></span>
               <span class="axg-att-stat__value" id="attCompleted">0</span>
-              <span class="axg-att-stat__label">Completed</span>
+              <span class="axg-att-stat__label">Workouts Done</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--completed" style="border-left-color:#22c55e;">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-user-check" style="color:#22c55e;"></i></span>
+              <span class="axg-att-stat__value" id="attPresentDays" style="color:#22c55e;">0</span>
+              <span class="axg-att-stat__label">Gym Present</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--not-entered" style="border-left-color:#ef4444;">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-user-xmark" style="color:#ef4444;"></i></span>
+              <span class="axg-att-stat__value" id="attAbsentDays" style="color:#ef4444;">0</span>
+              <span class="axg-att-stat__label">Gym Absent</span>
             </div>
 
             <div class="axg-att-stat axg-att-stat--rest">
               <span class="axg-att-stat__icon"><i class="fa-solid fa-bed"></i></span>
               <span class="axg-att-stat__value" id="attRest">0</span>
               <span class="axg-att-stat__label">Rest Days</span>
-            </div>
-
-            <div class="axg-att-stat axg-att-stat--not-entered">
-              <span class="axg-att-stat__icon"><i class="fa-solid fa-ban"></i></span>
-              <span class="axg-att-stat__value" id="attNotEntered">0</span>
-              <span class="axg-att-stat__label">Missed</span>
             </div>
 
             <div class="axg-att-stat axg-att-stat--not-recorded">
@@ -927,7 +1054,7 @@
             <div class="axg-att-stat axg-att-stat--attendance">
               <span class="axg-att-stat__icon"><i class="fa-solid fa-chart-column"></i></span>
               <span class="axg-att-stat__value" id="attPercent">0%</span>
-              <span class="axg-att-stat__label">Discipline</span>
+              <span class="axg-att-stat__label">Attendance %</span>
             </div>
 
           </div>
@@ -1524,6 +1651,9 @@
 
   <!-- Gym Attendance Admin Controller (Dynamic QR + GPS Geofence + Auto Absent) -->
   <script src="admin-attendance.js"></script>
+
+  <!-- Client Registration QR Controller (Permanent QR + Reception Kiosk) -->
+  <script src="admin-registration-qr.js"></script>
 
   <!-- Application Logic & Client Tracker (PostgreSQL + Prisma REST API) -->
   <script src="admin-app.js"></script>

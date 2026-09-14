@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Alpha X Gym — Member Registration</title>
+  <meta name="description" content="Official new member registration for Alpha X Gym athletes. Connect with Google, set your benchmark weight, and begin your transformation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root {
+      --bg-base: #060709;
+      --bg-surface: #0f1117;
+      --bg-card: #151821;
+      --bg-input: #1a1e29;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --border-focus: #e11d48;
+      --red-primary: #e11d48;
+      --red-hover: #f43f5e;
+      --red-glow: rgba(225, 29, 72, 0.4);
+      --text-pure: #ffffff;
+      --text-primary: #e2e8f0;
+      --text-muted: #94a3b8;
+      --green-accent: #10b981;
+      --font-brand: 'Poppins', 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --radius-lg: 24px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(225, 29, 72, 0.18) 0%, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(15, 17, 23, 0.8) 0%, transparent 60%);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 16px 40px;
+      overflow-x: hidden;
+    }
+
+    /* Mobile Container */
+    .reg-container {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Brand Header */
+    .reg-brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .brand-icon-wrap {
+      width: 54px;
+      height: 54px;
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 24px;
+      box-shadow: 0 8px 24px var(--red-glow);
+    }
+
+    .brand-title {
+      font-family: var(--font-brand);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-pure);
+    }
+
+    .brand-title span {
+      color: var(--red-primary);
+    }
+
+    /* Main Card */
+    .reg-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 28px 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reg-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #e11d48, #f43f5e, #e11d48);
+    }
+
+    /* Badges & Headings */
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      border-radius: 30px;
+      color: #fda4af;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .card-badge--green {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .card-title {
+      font-family: var(--font-brand);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text-pure);
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Views */
+    .view-step {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .view-step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Google Button Area */
+    .google-btn-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    #googleSignInBtn {
+      min-height: 48px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-demo-google {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-demo-google:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Form Elements */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-label i {
+      color: var(--red-primary);
+      font-size: 13px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 52px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 0 16px;
+      color: var(--text-pure);
+      font-family: var(--font-body);
+      font-size: 15px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+      background: #1e2330;
+    }
+
+    /* Readonly Email Input with Lock */
+    .input-readonly-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input--readonly {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      padding-right: 90px;
+    }
+
+    .input-lock-pill {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #10b981;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 4px 8px;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* Weight Input with KG Unit */
+    .input-unit-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-unit-badge {
+      position: absolute;
+      right: 16px;
+      font-family: var(--font-brand);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--red-primary);
+      pointer-events: none;
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    /* Photo Upload Area with Canvas Compression */
+    .photo-upload-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .photo-avatar-wrap {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+
+    .photo-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--red-primary);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .photo-camera-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--red-primary);
+      border: 2px solid var(--bg-card);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 12px;
+    }
+
+    .photo-actions-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-photo-pill {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-card);
+      color: var(--text-primary);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-photo-pill:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    /* Hidden file input */
+    #photoFileInput {
+      display: none;
+    }
+
+    /* Preview Card (YOUR PROFILE) */
+    .profile-preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .preview-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--red-primary);
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.3);
+    }
+
+    .preview-name {
+      font-family: var(--font-brand);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-pure);
+    }
+
+    .preview-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    .preview-data-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+      text-align: left;
+    }
+
+    .preview-metric-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .preview-metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .preview-metric-val {
+      font-family: var(--font-brand);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-pure);
+      margin-top: 2px;
+    }
+
+    /* Buttons */
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .btn-primary {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-brand);
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 6px 20px var(--red-glow);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover, .btn-primary:active {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      height: 50px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      font-family: var(--font-brand);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .btn-link-switch {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: underline;
+      display: inline-block;
+      text-align: center;
+    }
+
+    /* Error Message Box */
+    .error-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+
+    /* Loading Spinner Card */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .loading-spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--red-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Security Notice */
+    .security-notice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .security-notice i {
+      color: var(--green-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reg-container">
+
+    <!-- Brand Header -->
+    <header class="reg-brand-header">
+      <div class="brand-icon-wrap">
+        <i class="fa-solid fa-dumbbell"></i>
+      </div>
+      <div class="brand-title">ALPHA <span>X</span> GYM</div>
+    </header>
+
+    <!-- Main Registration Card -->
+    <main class="reg-card">
+
+      <!-- ==============================================
+           STEP 1: GOOGLE SIGN-IN GATEWAY
+      ============================================== -->
+      <section class="view-step active" id="stepGoogleSignIn">
+        <div class="card-badge">
+          <i class="fa-solid fa-user-plus"></i> Member Registration
+        </div>
+        <h1 class="card-title">WELCOME TO<br />ALPHA X GYM</h1>
+        <p class="card-subtitle">
+          Create your official member profile to track workouts, log bodyweight benchmarks, and participate in challenges.
+        </p>
+
+        <div class="google-btn-wrapper">
+          <!-- Official Google Sign-In Container -->
+          <div id="googleSignInBtn"></div>
+
+          <!-- Fast Demo Google Sign-In for frictionless testing -->
+          <button type="button" class="btn-demo-google" id="btnDemoGoogle">
+            <i class="fa-brands fa-google" style="color: #ea4335;"></i>
+            <span>Continue with Google (Fast Demo)</span>
+          </button>
+        </div>
+
+        <div class="security-notice" style="margin-top: 20px;">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>1 Google Account = 1 Alpha X Gym Member Profile</span>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           STEP 1.5: VERIFYING ACCOUNT LOADER
+      ============================================== -->
+      <section class="view-step" id="stepVerifying">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <div>
+            <div style="font-family: var(--font-brand); font-size: 16px; font-weight: 700; color: #fff;">
+              Verifying Google Account...
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+              Checking existing profile in Alpha X Gym database
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           CASE 2: EXISTING CLIENT PROFILE ("You already have an account")
+      ============================================== -->
+      <section class="view-step" id="stepExistingAccount">
+        <div class="card-badge card-badge--green">
+          <i class="fa-solid fa-circle-check"></i> Account Verified
+        </div>
+        <h2 class="card-title">You already have an<br />Alpha X Gym account.</h2>
+        <p class="card-subtitle">
+          Your profile is active and connected to this Google account. No duplicate registration needed.
+        </p>
+
+        <!-- Member Card Preview -->
+        <div class="existing-profile-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; margin-bottom: 24px;">
+          <img id="existingAvatar" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 3px solid var(--red-primary); box-shadow: 0 4px 16px rgba(0,0,0,0.5);" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Member Avatar" />
+          <div>
+            <div style="font-family: var(--font-brand); font-size: 20px; font-weight: 800; color: var(--text-pure);" id="existingName">Sundar</div>
+            <div style="font-size: 13px; color: var(--text-muted); word-break: break-all;" id="existingEmail">sundar@gmail.com</div>
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 4px;">
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-weight-scale" style="color: var(--red-primary);"></i>
+              <span>Weight: <strong id="existingWeight" style="color: #fff;">82.5 kg</strong></span>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-shield-check" style="color: var(--green-accent);"></i>
+              <span>Status: <strong id="existingStatus" style="color: #fff;">Active</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons for Existing Members -->
+        <div class="btn-stack">
+          <a href="/challenge.html" class="btn-primary" id="btnGoToProfile">
+            <i class="fa-solid fa-user-ninja"></i>
+            <span>GO TO MY PROFILE</span>
+          </a>
+          <a href="/checkin" class="btn-secondary" id="btnGoToCheckin">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>GO TO CHECK-IN</span>
+          </a>
+          <button type="button" class="btn-link-switch" id="btnSwitchAccount">
+            Sign in with a different Google account
+          </button>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           STEP 2: NEW CLIENT REGISTRATION FORM (PART 5)
+      ============================================== -->
+      <section class="view-step" id="stepRegistrationForm">
+        <div class="card-badge">
+          <i class="fa-solid fa-user-gear"></i> Complete Your Profile
+        </div>
+        <h2 class="card-title">COMPLETE YOUR<br />PROFILE</h2>
+        <p class="card-subtitle">
+          Please provide your details below. Your weight will serve as your starting benchmark.
+        </p>
+
+        <!-- Validation Error Message -->
+        <div class="error-box" id="formErrorBox">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="formErrorMsg">Please correct highlighted fields</span>
+        </div>
+
+        <form id="regForm" novalidate>
+          <!-- 1. Profile Photo Selection / Camera Capture -->
+          <div class="photo-upload-section">
+            <div class="photo-avatar-wrap">
+              <img id="photoPreviewImg" class="photo-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Member Photo Preview" />
+              <div class="photo-camera-badge">
+                <i class="fa-solid fa-camera"></i>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 12px; font-weight: 700; color: #fff;">Profile Photo</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                Take a selfie or choose from phone gallery
+              </div>
+            </div>
+            <div class="photo-actions-row">
+              <button type="button" class="btn-photo-pill" id="btnTriggerPhotoUpload">
+                <i class="fa-solid fa-camera"></i>
+                <span>Choose / Take Photo</span>
+              </button>
+              <button type="button" class="btn-photo-pill" id="btnUseGoogleAvatar">
+                <i class="fa-brands fa-google"></i>
+                <span>Use Google Photo</span>
+              </button>
+            </div>
+            <!-- Hidden Camera / File Input -->
+            <input type="file" id="photoFileInput" accept="image/*" />
+          </div>
+
+          <!-- 2. Full Name (Required) -->
+          <div class="form-group">
+            <label class="form-label" for="inputFullName">
+              <i class="fa-solid fa-user"></i> Full Name <span style="color: var(--red-primary);">*</span>
+            </label>
+            <input type="text" id="inputFullName" class="form-input" placeholder="e.g. Sundar Pichai" required />
+            <span class="form-hint">Your official athlete name on gym leaderboards</span>
+          </div>
+
+          <!-- 3. Email (Read-Only from Google) -->
+          <div class="form-group">
+            <label class="form-label" for="inputEmail">
+              <i class="fa-solid fa-envelope"></i> Email Address
+            </label>
+            <div class="input-readonly-wrap">
+              <input type="email" id="inputEmail" class="form-input form-input--readonly" readonly value="" />
+              <div class="input-lock-pill">
+                <i class="fa-solid fa-lock"></i> Verified
+              </div>
+            </div>
+            <span class="form-hint">Authenticated via Google. Cannot be manually changed.</span>
+          </div>
+
+          <!-- 4. Current Weight (Required numeric decimal) -->
+          <div class="form-group">
+            <label class="form-label" for="inputWeight">
+              <i class="fa-solid fa-weight-scale"></i> Current Weight (kg) <span style="color: var(--red-primary);">*</span>
+            </label>
+            <div class="input-unit-wrap">
+              <input type="number" id="inputWeight" class="form-input" placeholder="e.g. 82.5" step="0.1" min="25" max="350" inputmode="decimal" required />
+              <span class="input-unit-badge">kg</span>
+            </div>
+            <span class="form-hint">Used as your Day 1 starting benchmark for transformation progress</span>
+          </div>
+
+          <!-- Optional Phone -->
+          <div class="form-group">
+            <label class="form-label" for="inputPhone">
+              <i class="fa-solid fa-phone"></i> Phone Number <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">(Optional)</span>
+            </label>
+            <input type="tel" id="inputPhone" class="form-input" placeholder="e.g. +91 98765 43210" />
+            <span class="form-hint">For automated WhatsApp reports and coach notifications</span>
+          </div>
+
+          <!-- Submit Button to Preview -->
+          <div class="btn-stack" style="margin-top: 10px;">
+            <button type="submit" class="btn-primary" id="btnPreviewForm">
+              <i class="fa-solid fa-arrow-right"></i>
+              <span>PREVIEW PROFILE</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ==============================================
+           STEP 3: FORM PREVIEW (YOUR PROFILE)
+      ============================================== -->
+      <section class="view-step" id="stepProfilePreview">
+        <div class="card-badge card-badge--green">
+          <i class="fa-solid fa-id-card"></i> Ready to Submit
+        </div>
+        <h2 class="card-title">YOUR PROFILE</h2>
+        <p class="card-subtitle">
+          Please confirm your details before joining Alpha X Gym.
+        </p>
+
+        <!-- Preview Athlete Card -->
+        <div class="profile-preview-card">
+          <img id="previewPhotoImg" class="preview-avatar" src="" alt="Athlete Photo" />
+          <div>
+            <div class="preview-name" id="previewNameVal">Sundar</div>
+            <div class="preview-email" id="previewEmailVal">sundar@gmail.com</div>
+          </div>
+
+          <div class="preview-data-grid">
+            <div class="preview-metric-box">
+              <div class="preview-metric-label"><i class="fa-solid fa-weight-scale" style="color: var(--red-primary);"></i> Starting Weight</div>
+              <div class="preview-metric-val" id="previewWeightVal">82.5 kg</div>
+            </div>
+            <div class="preview-metric-box">
+              <div class="preview-metric-label"><i class="fa-solid fa-phone" style="color: var(--red-primary);"></i> Phone</div>
+              <div class="preview-metric-val" id="previewPhoneVal" style="font-size: 13px;">—</div>
+            </div>
+            <div class="preview-metric-box" style="grid-column: 1 / -1;">
+              <div class="preview-metric-label"><i class="fa-solid fa-calendar-check" style="color: var(--green-accent);"></i> Membership Protocol</div>
+              <div class="preview-metric-val" style="font-size: 14px; color: var(--green-accent);">
+                Active • 100-Day Transformation
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit & Edit Buttons -->
+        <div class="btn-stack">
+          <button type="button" class="btn-primary" id="btnSubmitAndJoin">
+            <i class="fa-solid fa-bolt-lightning"></i>
+            <span>SUBMIT &amp; JOIN ALPHA X GYM</span>
+          </button>
+          <button type="button" class="btn-secondary" id="btnBackToEdit">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>EDIT INFORMATION</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Submitting Progress View -->
+      <section class="view-step" id="stepSubmitting">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <div>
+            <div style="font-family: var(--font-brand); font-size: 18px; font-weight: 800; color: #fff;">
+              Creating Your Profile...
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+              Recording starting weight benchmark and syncing dashboard
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           STEP 4: REGISTRATION SUCCESS SCREEN (PART 6)
+      ============================================== -->
+      <section class="view-step" id="stepSuccessScreen">
+        <div class="card-badge card-badge--green">
+          <i class="fa-solid fa-sparkles"></i> Registration Successful
+        </div>
+        <h2 class="card-title">🎉 WELCOME TO<br />ALPHA X GYM</h2>
+        <p class="card-subtitle">
+          Your profile has been created successfully.
+        </p>
+
+        <!-- Success Profile Summary Card -->
+        <div class="existing-profile-card">
+          <img id="successAvatar" class="client-avatar-preview" src="" alt="Athlete Avatar" />
+          <div>
+            <div class="client-name-display" id="successName">Sundar</div>
+            <div class="client-email-display" id="successEmail">sundar@gmail.com</div>
+          </div>
+          <div class="meta-pills-row" style="flex-direction: column; align-items: center; gap: 8px;">
+            <div class="meta-pill" style="width: 100%; justify-content: space-between;">
+              <span><i class="fa-solid fa-weight-scale" style="color: var(--red-primary);"></i> Starting Weight:</span>
+              <strong id="successWeight" style="color: #fff;">82.5 kg</strong>
+            </div>
+            <div class="meta-pill" style="width: 100%; justify-content: space-between;">
+              <span><i class="fa-solid fa-calendar-day" style="color: var(--green-accent);"></i> Registration:</span>
+              <strong id="successDate" style="color: #fff;">14 September 2026</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-stack">
+          <a href="/challenge.html" class="btn-primary" id="btnSuccessContinue">
+            <i class="fa-solid fa-arrow-right"></i>
+            <span>CONTINUE</span>
+          </a>
+          <a href="/checkin" class="btn-secondary" id="btnSuccessCheckin">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>GO TO CHECK-IN</span>
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Security Footer -->
+    <footer style="text-align: center; font-size: 11px; color: var(--text-muted);">
+      Alpha X Gym • Official Member Onboarding • 2026
+    </footer>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Elements
+      const stepGoogleSignIn = document.getElementById('stepGoogleSignIn');
+      const stepVerifying = document.getElementById('stepVerifying');
+      const stepExistingAccount = document.getElementById('stepExistingAccount');
+      const stepRegistrationForm = document.getElementById('stepRegistrationForm');
+      const stepProfilePreview = document.getElementById('stepProfilePreview');
+      const stepSubmitting = document.getElementById('stepSubmitting');
+      const stepSuccessScreen = document.getElementById('stepSuccessScreen');
+
+      // Existing Account Elements
+      const existingAvatar = document.getElementById('existingAvatar');
+      const existingName = document.getElementById('existingName');
+      const existingEmail = document.getElementById('existingEmail');
+      const existingWeight = document.getElementById('existingWeight');
+      const existingStatus = document.getElementById('existingStatus');
+
+      // Success Elements
+      const successAvatar = document.getElementById('successAvatar');
+      const successName = document.getElementById('successName');
+      const successEmail = document.getElementById('successEmail');
+      const successWeight = document.getElementById('successWeight');
+      const successDate = document.getElementById('successDate');
+
+      // Form Elements
+      const regForm = document.getElementById('regForm');
+      const formErrorBox = document.getElementById('formErrorBox');
+      const formErrorMsg = document.getElementById('formErrorMsg');
+      const photoPreviewImg = document.getElementById('photoPreviewImg');
+      const photoFileInput = document.getElementById('photoFileInput');
+      const btnTriggerPhotoUpload = document.getElementById('btnTriggerPhotoUpload');
+      const btnUseGoogleAvatar = document.getElementById('btnUseGoogleAvatar');
+      const inputFullName = document.getElementById('inputFullName');
+      const inputEmail = document.getElementById('inputEmail');
+      const inputWeight = document.getElementById('inputWeight');
+      const inputPhone = document.getElementById('inputPhone');
+
+      // Preview Elements
+      const previewPhotoImg = document.getElementById('previewPhotoImg');
+      const previewNameVal = document.getElementById('previewNameVal');
+      const previewEmailVal = document.getElementById('previewEmailVal');
+      const previewWeightVal = document.getElementById('previewWeightVal');
+      const previewPhoneVal = document.getElementById('previewPhoneVal');
+      const btnSubmitAndJoin = document.getElementById('btnSubmitAndJoin');
+      const btnBackToEdit = document.getElementById('btnBackToEdit');
+
+      // Action Buttons
+      const btnDemoGoogle = document.getElementById('btnDemoGoogle');
+      const btnSwitchAccount = document.getElementById('btnSwitchAccount');
+
+      // State
+      window.axgRegistrationState = {
+        googleUser: null,
+        registrationSessionToken: null,
+        activePhotoDataUrl: '',
+      };
+
+      function showStep(stepEl) {
+        document.querySelectorAll('.view-step').forEach((el) => el.classList.remove('active'));
+        if (stepEl) stepEl.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function showError(msg) {
+        if (formErrorBox && formErrorMsg) {
+          formErrorMsg.textContent = msg;
+          formErrorBox.style.display = 'flex';
+        }
+      }
+
+      function hideError() {
+        if (formErrorBox) {
+          formErrorBox.style.display = 'none';
+        }
+      }
+
+      // Handle Google Sign-In Callback (Credential or Demo)
+      async function handleGoogleAuthPayload(payload) {
+        showStep(stepVerifying);
+
+        try {
+          const res = await fetch('/api/registration/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Google login failed');
+          }
+
+          if (data.exists && data.client) {
+            // ------------------------------------------------------------
+            // CASE 2 — EXISTING CLIENT
+            // ------------------------------------------------------------
+            if (data.token) {
+              localStorage.setItem('axg_client_token', data.token);
+              localStorage.setItem('axg_current_client', JSON.stringify(data.client));
+            }
+
+            existingName.textContent = data.client.name || 'Alpha Athlete';
+            existingEmail.textContent = data.client.email || 'Verified Member';
+            existingAvatar.src = data.client.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+            existingWeight.textContent = data.client.currentWeight 
+              ? `${data.client.currentWeight} kg` 
+              : data.client.startingWeight ? `${data.client.startingWeight} kg` : '—';
+            existingStatus.textContent = data.client.status === 'active' ? 'Active Member' : data.client.status;
+
+            showStep(stepExistingAccount);
+          } else {
+            // ------------------------------------------------------------
+            // CASE 1 — NEW CLIENT
+            // ------------------------------------------------------------
+            window.axgRegistrationState.googleUser = data.googleUser;
+            window.axgRegistrationState.registrationSessionToken = data.registrationSessionToken;
+
+            // Pre-fill form from verified Google account
+            inputFullName.value = data.googleUser.name || '';
+            inputEmail.value = data.googleUser.email || '';
+            window.axgRegistrationState.activePhotoDataUrl = data.googleUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+            photoPreviewImg.src = window.axgRegistrationState.activePhotoDataUrl;
+
+            showStep(stepRegistrationForm);
+          }
+        } catch (err) {
+          console.error('Registration auth error:', err);
+          alert(err.message || 'Failed to authenticate with Google. Please try again.');
+          showStep(stepGoogleSignIn);
+        }
+      }
+
+      // Client-side Canvas Photo Compression (Max 400x400 JPEG at 82% quality)
+      function compressAndSetPhoto(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          showError('Please select a valid image file (JPG, PNG, WebP).');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const maxDim = 400;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxDim) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              }
+            } else {
+              if (height > maxDim) {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Compress to lightweight data URL (~40-60KB)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+            window.axgRegistrationState.activePhotoDataUrl = compressedDataUrl;
+            photoPreviewImg.src = compressedDataUrl;
+            hideError();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Photo upload trigger
+      btnTriggerPhotoUpload.addEventListener('click', () => {
+        photoFileInput.click();
+      });
+
+      photoFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          compressAndSetPhoto(e.target.files[0]);
+        }
+      });
+
+      // Use Google Photo
+      btnUseGoogleAvatar.addEventListener('click', () => {
+        if (window.axgRegistrationState.googleUser?.avatarUrl) {
+          window.axgRegistrationState.activePhotoDataUrl = window.axgRegistrationState.googleUser.avatarUrl;
+          photoPreviewImg.src = window.axgRegistrationState.activePhotoDataUrl;
+          hideError();
+        }
+      });
+
+      // Form Submission -> Move to Preview
+      regForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        hideError();
+
+        const name = inputFullName.value.trim();
+        const weightStr = inputWeight.value.trim();
+        const weight = parseFloat(weightStr);
+        const phone = inputPhone.value.trim();
+
+        // 1. Validate Full Name
+        if (!name || name.length < 2) {
+          showError('Please enter your full legal name (at least 2 characters).');
+          inputFullName.focus();
+          return;
+        }
+
+        // 2. Validate Weight
+        if (isNaN(weight) || weight < 25 || weight > 350) {
+          showError('Please enter a valid current weight between 25 kg and 350 kg.');
+          inputWeight.focus();
+          return;
+        }
+
+        // Populate Preview View
+        previewPhotoImg.src = window.axgRegistrationState.activePhotoDataUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+        previewNameVal.textContent = name;
+        previewEmailVal.textContent = inputEmail.value || 'Verified Google Account';
+        previewWeightVal.textContent = `${weight.toFixed(1)} kg`;
+        previewPhoneVal.textContent = phone ? phone : 'None provided';
+
+        // Transition to Form Preview Step
+        showStep(stepProfilePreview);
+      });
+
+      // Back to edit
+      btnBackToEdit.addEventListener('click', () => {
+        showStep(stepRegistrationForm);
+      });
+
+      // Submit & Join Alpha X Gym (Part 6 Backend Submission)
+      btnSubmitAndJoin.addEventListener('click', async () => {
+        showStep(stepSubmitting);
+
+        try {
+          const res = await fetch('/api/registration/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionToken: window.axgRegistrationState.registrationSessionToken,
+              name: inputFullName.value.trim(),
+              weight: parseFloat(inputWeight.value.trim()),
+              phone: inputPhone.value.trim() || null,
+              photoUrl: window.axgRegistrationState.activePhotoDataUrl,
+            }),
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to submit registration');
+          }
+
+          // Save authenticated client token
+          if (data.token) {
+            localStorage.setItem('axg_client_token', data.token);
+            localStorage.setItem('axg_current_client', JSON.stringify(data.client));
+          }
+
+          // Populate Success Screen
+          successAvatar.src = data.client.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+          successName.textContent = data.client.name || 'Sundar';
+          successEmail.textContent = data.client.email || 'Verified Member';
+          successWeight.textContent = `${data.client.startingWeight || data.client.currentWeight || '—'} kg`;
+          successDate.textContent = data.client.formattedRegistrationDate || new Date().toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          });
+
+          // Show Success Screen
+          showStep(stepSuccessScreen);
+
+        } catch (submitErr) {
+          console.error('Submission error:', submitErr);
+          alert(submitErr.message || 'Submission failed. Please try again.');
+          showStep(stepProfilePreview);
+        }
+      });
+
+      // Initialize Official Google Identity Services
+      async function initGoogleOAuth() {
+        try {
+          const res = await fetch('/api/registration/config');
+          const config = await res.json();
+
+          if (window.google && config.googleClientId) {
+            window.google.accounts.id.initialize({
+              client_id: config.googleClientId,
+              callback: (response) => {
+                handleGoogleAuthPayload({ credential: response.credential });
+              },
+              auto_select: false,
+              cancel_on_tap_outside: true,
+            });
+
+            window.google.accounts.id.renderButton(
+              document.getElementById('googleSignInBtn'),
+              {
+                theme: 'filled_black',
+                size: 'large',
+                width: 320,
+                text: 'continue_with',
+                shape: 'pill',
+              }
+            );
+          }
+        } catch (e) {
+          console.warn('Google client init notice:', e);
+        }
+      }
+
+      // Demo Google Sign-In Button
+      if (btnDemoGoogle) {
+        btnDemoGoogle.addEventListener('click', () => {
+          handleGoogleAuthPayload({
+            demoUser: {
+              googleId: 'google-sub-sundar-2026',
+              email: 'sundar@gmail.com',
+              name: 'Sundar',
+              avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            },
+          });
+        });
+      }
+
+      // Switch Account button
+      if (btnSwitchAccount) {
+        btnSwitchAccount.addEventListener('click', () => {
+          localStorage.removeItem('axg_client_token');
+          window.axgRegistrationState = { googleUser: null, registrationSessionToken: null, activePhotoDataUrl: '' };
+          showStep(stepGoogleSignIn);
+        });
+      }
+
+      // Start
+      window.addEventListener('load', () => {
+        initGoogleOAuth();
+      });
+
+    })();
+  </script>
+</body>
+</html>

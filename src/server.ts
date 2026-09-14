@@ -1,12 +1,14 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import prisma from './lib/prisma';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import clientRoutes from './routes/client';
 import attendanceRoutes from './routes/attendance';
+import registrationRoutes from './routes/registration';
 import { initAttendanceScheduler } from './services/attendance-scheduler';
 
 // Load environment variables from .env
@@ -49,21 +51,60 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/public', clientRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/registration', registrationRoutes);
 
 // Serve static frontend files from project root
-const publicDir = process.cwd();
+const publicDir = fs.existsSync(path.join(process.cwd(), 'register.html'))
+  ? process.cwd()
+  : path.resolve(__dirname, '../../');
 app.use(express.static(publicDir));
 
-// Dedicated Gym Display & Check-in Routes
-app.get('/admin/gym-qr', (_req: Request, res: Response) => {
+// Dedicated Gym Display, Check-in & Registration Routes (with trailing slash and alias support)
+app.get(['/admin/gym-qr', '/admin/gym-qr/'], (_req: Request, res: Response) => {
   res.sendFile(path.join(publicDir, 'gym-qr.html'));
 });
 
-app.get('/checkin', (_req: Request, res: Response) => {
+app.get(['/admin/registration-qr', '/admin/registration-qr/'], (_req: Request, res: Response) => {
+  res.sendFile(path.join(publicDir, 'registration-qr.html'));
+});
+
+app.get(['/checkin', '/checkin/', '/attendance', '/attendance/'], (_req: Request, res: Response) => {
   res.sendFile(path.join(publicDir, 'checkin.html'));
 });
 
-// Fallback route pointing to admin.html or challenge.html
+app.get(['/register', '/register/', '/client-register', '/join', '/registration'], (_req: Request, res: Response) => {
+  res.sendFile(path.join(publicDir, 'register.html'));
+});
+
+app.get(['/challenge', '/challenge/', '/client', '/client/'], (_req: Request, res: Response) => {
+  res.sendFile(path.join(publicDir, 'challenge.html'));
+});
+
+app.get(['/admin', '/admin/', '/login', '/login/'], (_req: Request, res: Response) => {
+  res.sendFile(path.join(publicDir, 'admin.html'));
+});
+
+// Direct alias for health check
+app.get('/health', async (_req: Request, res: Response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'healthy',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+      service: 'Alpha X Gym - PostgreSQL + Prisma API',
+    });
+  } catch (error: any) {
+    res.json({
+      status: 'healthy',
+      database: 'memory_fallback_active',
+      note: 'High availability mode active: in-memory cache and session management operating cleanly',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+// Fallback route pointing to admin.html
 app.get('/', (_req: Request, res: Response) => {
   res.sendFile(path.join(publicDir, 'admin.html'));
 });

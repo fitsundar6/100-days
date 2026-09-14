@@ -147,6 +147,11 @@ function getCurrentWeight(client) {
       return parseFloat(weights[i]);
     }
   }
+
+  if (client.currentWeight !== null && client.currentWeight !== undefined && client.currentWeight !== '') {
+    return parseFloat(client.currentWeight);
+  }
+
   return client.startingWeight;
 }
 
@@ -212,9 +217,10 @@ function renderTable() {
 
   let filtered = clients.filter(c => {
     const term = currentSearch.toLowerCase();
-    const matchName  = c.name.toLowerCase().includes(term);
+    const matchName  = c.name ? c.name.toLowerCase().includes(term) : false;
     const matchPhone = c.phone ? c.phone.includes(term) : false;
-    if (!matchName && !matchPhone) return false;
+    const matchEmail = c.email ? c.email.toLowerCase().includes(term) : false;
+    if (!matchName && !matchPhone && !matchEmail) return false;
 
     if (currentFilter === 'all') return true;
     const { status } = calcChallengeDay(c.startDate);
@@ -239,7 +245,7 @@ function renderTable() {
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align:center; color:var(--text-dim); padding:32px;">
+        <td colspan="8" style="text-align:center; color:var(--text-dim); padding:32px;">
           No clients match your search or filter.
         </td>
       </tr>`;
@@ -273,44 +279,57 @@ function renderTable() {
       ? client.name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase()
       : 'AX';
 
+    const avatarHtml = client.avatarUrl
+      ? `<img src="${escHtml(client.avatarUrl)}" alt="${escHtml(client.name)}" class="axg-client-avatar-thumb" />`
+      : `<span class="axg-client-avatar-circle">${initials}</span>`;
+
+    const joinedDateStr = client.formattedJoinedDate || fmtDate(client.registeredAt || client.createdAt || client.startDate);
+
     const tr = document.createElement('tr');
     tr.dataset.clientId = client.id;
 
     tr.innerHTML = `
-      <td data-label="Client" class="axg-table__cell--client">
+      <td data-label="Photo" style="text-align:center; width:52px;">
+        <button type="button" class="btn-view" data-id="${client.id}" style="background:transparent; border:none; cursor:pointer; padding:0;">
+          ${avatarHtml}
+        </button>
+      </td>
+      <td data-label="Name" class="axg-table__cell--client">
         <button type="button" class="axg-client-cell-btn btn-view" data-id="${client.id}" title="Touch to see all client data">
-          <span class="axg-client-avatar-circle">${initials}</span>
           <div class="axg-client-info-col">
             <span class="axg-table__name">${escHtml(client.name)}</span>
-            <span class="axg-touch-hint-pill"><i class="fa-solid fa-folder-open"></i> Touch to see all data</span>
+            <span class="axg-table__phone-sub">${phoneDisplay}</span>
           </div>
         </button>
       </td>
-      <td data-label="WhatsApp" class="axg-table__phone">
-        ${phoneDisplay}
+      <td data-label="Email">
+        <div class="axg-table__email-wrap" title="${escHtml(client.email || 'No email')}">
+          <i class="fa-solid fa-shield-halved" style="color:#22c55e; font-size:11px;"></i>
+          <span>${client.email ? escHtml(client.email) : '<span style="color:var(--text-dim);">—</span>'}</span>
+        </div>
       </td>
-      <td data-label="Start Weight" class="axg-table__weight">
-        ${client.startingWeight} kg
-      </td>
-      <td data-label="Current Weight" class="axg-table__weight">
-        ${currentW} kg
-      </td>
-      <td data-label="Change" class="${changeClass}">
-        ${changeText}
-      </td>
-      <td data-label="Day">
-        ${dayLabel}
-      </td>
-      <td data-label="Progress">
-        <div class="axg-mini-progress">
-          <span class="axg-mini-progress__label">${pct}%</span>
-          <div class="axg-mini-progress__track">
-            <div class="${fillClass}" style="width:${pct}%"></div>
-          </div>
+      <td data-label="Weight">
+        <div class="axg-table__weight-group">
+          <span class="axg-weight-curr">${currentW} kg</span>
+          <span class="axg-weight-sub">Start: ${client.startingWeight} kg &bull; <span class="${changeClass}">${changeText}</span></span>
         </div>
       </td>
       <td data-label="Status">
         <span class="axg-badge ${badgeClass}">${statusLabel}</span>
+      </td>
+      <td data-label="Joined Date">
+        <span class="axg-table__joined-date">
+          <i class="fa-regular fa-calendar" style="color:var(--text-dim); margin-right:4px;"></i>
+          ${escHtml(joinedDateStr)}
+        </span>
+      </td>
+      <td data-label="Progress">
+        <div class="axg-mini-progress">
+          <span class="axg-mini-progress__label">${pct}% (${dayLabel})</span>
+          <div class="axg-mini-progress__track">
+            <div class="${fillClass}" style="width:${pct}%"></div>
+          </div>
+        </div>
       </td>
       <td data-label="Actions">
         <div class="axg-table-actions">
@@ -318,13 +337,12 @@ function renderTable() {
             <i class="fa-solid fa-eye"></i> <span>All Data</span>
           </button>
           <button type="button" class="axg-icon-btn axg-icon-btn--whatsapp btn-whatsapp" data-id="${client.id}" title="Send WhatsApp Report">💬</button>
-          <button type="button" class="axg-icon-btn btn-edit"   data-id="${client.id}" title="Edit">✏️</button>
           <button type="button" class="axg-icon-btn axg-icon-btn--delete btn-delete" data-id="${client.id}" title="Delete">🗑</button>
         </div>
       </td>`;
 
     tr.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-whatsapp') || e.target.closest('.btn-edit') || e.target.closest('.btn-delete')) return;
+      if (e.target.closest('.btn-whatsapp') || e.target.closest('.btn-delete')) return;
       openClientDetail(client.id);
     });
 
@@ -473,12 +491,41 @@ function openClientDetail(clientId) {
     phoneEl.textContent = '📱 No WhatsApp phone added';
   }
 
+  const emailEl = document.getElementById('detailClientEmailText');
+  if (emailEl) {
+    emailEl.textContent = client.email ? client.email : 'No verified email';
+  }
+
+  const avatarImg = document.getElementById('detailClientAvatarImg');
+  const avatarFallback = document.getElementById('detailClientAvatarFallback');
+  if (client.avatarUrl) {
+    if (avatarImg) {
+      avatarImg.src = client.avatarUrl;
+      avatarImg.style.display = 'block';
+    }
+    if (avatarFallback) avatarFallback.style.display = 'none';
+  } else {
+    if (avatarImg) avatarImg.style.display = 'none';
+    if (avatarFallback) avatarFallback.style.display = 'block';
+  }
+
+  const regDateEl = document.getElementById('detailRegisteredDate');
+  if (regDateEl) {
+    regDateEl.textContent = client.formattedJoinedDate || fmtDate(client.registeredAt || client.createdAt || client.startDate);
+  }
+
+  const memStatusEl = document.getElementById('detailMembershipStatus');
+  if (memStatusEl) {
+    const s = (client.status || 'Active').toUpperCase();
+    memStatusEl.textContent = s;
+    memStatusEl.className = 'axg-badge ' + (s === 'ACTIVE' ? 'axg-badge--active' : 'axg-badge--completed');
+  }
+
   document.getElementById('detailStartDate').textContent = fmtDate(client.startDate);
-  document.getElementById('detailEndDate').textContent   = fmtDate(client.endDate);
   document.getElementById('detailCurrentDay').textContent = status === 'upcoming' ? 'Not started' : `Day ${day}`;
 
-  const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
-  document.getElementById('detailStatus').textContent = statusLabel;
+  const attRateEl = document.getElementById('detailAttendanceRate');
+  if (attRateEl) attRateEl.textContent = '100%';
 
   document.getElementById('detailStartWeight').textContent   = `${client.startingWeight} kg`;
   document.getElementById('detailCurrentWeight').textContent = `${currentW} kg`;
@@ -531,21 +578,45 @@ function openClientDetail(clientId) {
 
   document.getElementById('clientDetailModal').style.display = 'flex';
 
-  // Fetch live 100-day completion matrix from PostgreSQL
+  // Fetch live client details and 100-day completion matrix from PostgreSQL
   fetch('/api/admin/clients/' + clientId)
     .then(r => r.json())
     .then(d => {
-      if (d.success && d.client && Array.isArray(d.client.dayMatrix)) {
-        d.client.dayMatrix.forEach(dm => {
-          if (dm.completed) {
-            const cell = document.querySelector(`.axg-day-cell[data-day="${dm.dayNumber}"]`);
-            if (cell) {
-              cell.className = 'axg-day-cell axg-day-cell--completed';
-              const iconEl = cell.querySelector('.axg-day-cell__icon');
-              if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>';
+      if (d.success && d.client) {
+        const dc = d.client;
+        if (dc.avatarUrl && avatarImg) {
+          avatarImg.src = dc.avatarUrl;
+          avatarImg.style.display = 'block';
+          if (avatarFallback) avatarFallback.style.display = 'none';
+        }
+        if (dc.email && emailEl) {
+          emailEl.textContent = dc.email;
+        }
+        if (dc.formattedRegisteredAt && regDateEl) {
+          regDateEl.textContent = dc.formattedRegisteredAt;
+        }
+        if (dc.attendanceSummary) {
+          const attP = document.getElementById('attPresentDays');
+          const attA = document.getElementById('attAbsentDays');
+          const attPct = document.getElementById('attPercent');
+          const attRate = document.getElementById('detailAttendanceRate');
+          if (attP) attP.textContent = dc.attendanceSummary.presentDays;
+          if (attA) attA.textContent = dc.attendanceSummary.absentDays;
+          if (attPct) attPct.textContent = `${dc.attendanceSummary.attendancePct}%`;
+          if (attRate) attRate.textContent = `${dc.attendanceSummary.attendancePct}%`;
+        }
+        if (Array.isArray(dc.dayMatrix)) {
+          dc.dayMatrix.forEach(dm => {
+            if (dm.completed) {
+              const cell = document.querySelector(`.axg-day-cell[data-day="${dm.dayNumber}"]`);
+              if (cell) {
+                cell.className = 'axg-day-cell axg-day-cell--completed';
+                const iconEl = cell.querySelector('.axg-day-cell__icon');
+                if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>';
+              }
             }
-          }
-        });
+          });
+        }
       }
     })
     .catch(() => {});
@@ -1359,18 +1430,24 @@ async function syncFromPostgres() {
       if (data.success && Array.isArray(data.clients) && data.clients.length > 0) {
         const local = loadClients();
         const merged = data.clients.map(c => {
-          const lMatch = local.find(l => l.id === c.id || l.phone === c.phone);
+          const lMatch = local.find(l => l.id === c.id || l.phone === c.phone || (c.email && l.email === c.email));
           return {
             id: c.id,
             name: c.name,
-            phone: c.phone,
+            phone: c.phone || lMatch?.phone || '',
+            email: c.email || lMatch?.email || '',
+            avatarUrl: c.avatarUrl || lMatch?.avatarUrl || null,
+            status: c.status || lMatch?.status || 'Active',
             startingWeight: c.startingWeight || lMatch?.startingWeight || 80,
             endingWeight: c.endingWeight || lMatch?.endingWeight || null,
+            currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight,
             targetWeight: c.targetWeight || lMatch?.targetWeight || null,
-            startDate: lMatch?.startDate || toInputDate(new Date(Date.now() - 14 * 86400000)),
-            endDate: lMatch?.endDate || toInputDate(addDays(new Date(), 85)),
+            startDate: lMatch?.startDate || toInputDate(c.registeredAt || c.createdAt || new Date()),
+            endDate: lMatch?.endDate || toInputDate(addDays(c.registeredAt || c.createdAt || new Date(), 99)),
             weeklyWeights: c.weeklyWeights || lMatch?.weeklyWeights || [c.startingWeight],
             dailyCheckins: lMatch?.dailyCheckins || [],
+            registeredAt: c.registeredAt || lMatch?.registeredAt || c.createdAt || new Date().toISOString(),
+            formattedJoinedDate: c.formattedJoinedDate || lMatch?.formattedJoinedDate || fmtDate(c.registeredAt || c.createdAt),
             createdAt: c.createdAt || new Date().toISOString(),
           };
         });
@@ -1384,10 +1461,87 @@ async function syncFromPostgres() {
   }
 }
 
+/* ============================================================
+   17. REAL-TIME REGISTRATION NOTIFICATIONS POLLING
+   ============================================================ */
+
+let lastRegistrationCheck = new Date(Date.now() - 3600 * 1000).toISOString();
+const notifiedClientIds = new Set();
+
+async function pollNewRegistrations() {
+  try {
+    const url = `/api/admin/notifications/registrations?since=${encodeURIComponent(lastRegistrationCheck)}`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.success && Array.isArray(data.notifications) && data.notifications.length > 0) {
+      lastRegistrationCheck = new Date().toISOString();
+      let hasNew = false;
+      for (const notif of data.notifications) {
+        if (!notifiedClientIds.has(notif.id)) {
+          notifiedClientIds.add(notif.id);
+          hasNew = true;
+          showRegistrationToast(notif);
+        }
+      }
+      if (hasNew) {
+        syncFromPostgres();
+      }
+    }
+  } catch (err) {
+    // silent fallback
+  }
+}
+
+function showRegistrationToast(client) {
+  const existing = document.querySelector(`.axg-toast--registration[data-client-id="${client.id}"]`);
+  if (existing) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'axg-toast axg-toast--registration';
+  toast.dataset.clientId = client.id;
+
+  const photoHtml = client.avatarUrl
+    ? `<img src="${client.avatarUrl}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #f59e0b; flex-shrink:0;" />`
+    : `<div style="width:36px; height:36px; border-radius:50%; background:#f59e0b; color:#000; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;">🎉</div>`;
+
+  toast.innerHTML = `
+    <div style="display:flex; align-items:center; gap:12px; flex:1;">
+      ${photoHtml}
+      <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+        <span style="font-weight:700; color:#f59e0b; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+          <i class="fa-solid fa-sparkles"></i> NEW CLIENT REGISTERED
+        </span>
+        <span style="font-weight:700; color:#fff; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${escHtml(client.name)}
+        </span>
+        <span style="font-size:11px; color:var(--text-muted);">
+          ${client.email ? escHtml(client.email) + ' &bull; ' : ''}${client.startingWeight} kg
+        </span>
+      </div>
+    </div>
+    <button type="button" class="axg-toast-btn-action" data-id="${client.id}">
+      VIEW CLIENT
+    </button>
+  `;
+
+  toast.querySelector('.axg-toast-btn-action').addEventListener('click', () => {
+    openClientDetail(client.id);
+    toast.remove();
+  });
+
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 8000);
+}
+
 function init() {
   renderTable();
   updateStats();
   syncFromPostgres();
+  // Poll new registrations every 8 seconds
+  setInterval(pollNewRegistrations, 8000);
 }
 
 init();

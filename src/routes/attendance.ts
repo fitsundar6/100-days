@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { generateDynamicGymQr } from '../services/qr-token';
+import { resolveBaseUrl } from './registration';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -11,13 +12,7 @@ const router = Router();
  */
 router.get('/qr-token', async (req: Request, res: Response) => {
   try {
-    // Resolve public base URL for dynamic QR check-in links:
-    // 1. Explicit production environment variable (BASE_URL or APP_URL)
-    // 2. Request host with protocol (via trust proxy for HTTPS)
-    const envBaseUrl = (process.env.BASE_URL || process.env.APP_URL || '').trim().replace(/\/+$/, '');
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || 'localhost:3000';
-    const baseUrl = envBaseUrl || `${protocol}://${host}`;
+    const baseUrl = resolveBaseUrl(req);
 
     const specificGymId = req.query.gymId ? String(req.query.gymId) : undefined;
     const qrData = await generateDynamicGymQr(baseUrl, specificGymId);
@@ -85,6 +80,7 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { requireClientAuth, ClientAuthenticatedRequest } from '../middleware/auth';
 import { validateDynamicQrToken } from '../services/qr-token';
+import { inMemoryRegisteredClients } from './registration';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
@@ -214,6 +210,19 @@ router.post('/auth/google', async (req: Request, res: Response) => {
         }
       } catch (e) {
         console.warn('DB lookup error by email:', e);
+      }
+    }
+
+    // Check in-memory registered clients fallback store
+    if (!client && inMemoryRegisteredClients.has(googleId)) {
+      client = inMemoryRegisteredClients.get(googleId);
+    }
+    if (!client && email) {
+      for (const mem of inMemoryRegisteredClients.values()) {
+        if (mem.email && mem.email.toLowerCase() === email.toLowerCase()) {
+          client = mem;
+          break;
+        }
       }
     }
 
@@ -359,6 +368,10 @@ router.get('/auth/me', requireClientAuth, async (req: ClientAuthenticatedRequest
         },
       });
     } catch (e) {}
+
+    if (!client && req.client?.googleId && inMemoryRegisteredClients.has(req.client.googleId)) {
+      client = inMemoryRegisteredClients.get(req.client.googleId);
+    }
 
     const todayDate = getKolkataDateString();
     let todayAttendance = null;
@@ -557,6 +570,10 @@ router.post('/checkin', requireClientAuth, async (req: ClientAuthenticatedReques
       );
     } catch (e) {
       console.warn('DB lookup error for client status check:', e);
+    }
+
+    if (!client && req.client?.googleId && inMemoryRegisteredClients.has(req.client.googleId)) {
+      client = inMemoryRegisteredClients.get(req.client.googleId);
     }
 
     if (client && client.status !== 'active') {

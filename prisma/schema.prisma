@@ -38,12 +38,13 @@ model Client {
   googleId              String?                @unique
   name                  String
   phone                 String?                @unique
-  email                 String?
+  email                 String?                @unique
   avatarUrl             String?
   startingWeight        Float?
   currentWeight         Float?
   endingWeight          Float?
   status                String                 @default("active") // "active", "completed", "dropped"
+  registeredAt          DateTime               @default(now())
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   challengeParticipants ChallengeParticipant[]

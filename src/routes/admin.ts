@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { requireAdminAuth, AuthenticatedRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import { inMemoryRegisteredClients } from './registration';
 
 const router = Router();
 
@@ -107,25 +108,30 @@ router.get('/dashboard-stats', async (req: AuthenticatedRequest, res: Response) 
  */
 router.get('/clients', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const clients = await prisma.client.findMany({
-      include: {
-        challengeParticipants: {
-          include: {
-            completions: {
-              where: { status: 'completed' },
-              include: {
-                workoutDay: true,
+    let clients: any[] = [];
+    try {
+      clients = await prisma.client.findMany({
+        include: {
+          challengeParticipants: {
+            include: {
+              completions: {
+                where: { status: 'completed' },
+                include: {
+                  workoutDay: true,
+                },
+                orderBy: { completedAt: 'desc' },
               },
-              orderBy: { completedAt: 'desc' },
             },
           },
+          weightLogs: {
+            orderBy: { date: 'asc' },
+          },
         },
-        weightLogs: {
-          orderBy: { date: 'asc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (dbErr) {
+      console.warn('DB clients query fallback to in-memory:', dbErr);
+    }
 
     const clientSummaries = clients.map((c: any) => {
       // Find latest weight from logs or currentWeight or startingWeight
@@ -180,8 +186,40 @@ router.get('/clients', async (req: AuthenticatedRequest, res: Response) => {
         avgDurationMinutes: avgDurationMins,
         lastWorkout,
         weeklyWeights,
+        avatarUrl: c.avatarUrl || null,
+        registeredAt: c.registeredAt || c.createdAt,
+        formattedJoinedDate: (c.registeredAt || c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
         createdAt: c.createdAt,
       };
+    });
+
+    // Merge in-memory registered clients if not already in DB
+    inMemoryRegisteredClients.forEach((memClient) => {
+      if (!clientSummaries.some((c: any) => c.id === memClient.id || (memClient.email && c.email === memClient.email))) {
+        const regDate = new Date(memClient.registeredAt || memClient.createdAt);
+        clientSummaries.unshift({
+          id: memClient.id,
+          name: memClient.name,
+          phone: memClient.phone,
+          email: memClient.email || '',
+          status: memClient.status,
+          startingWeight: memClient.startingWeight,
+          currentWeight: memClient.currentWeight,
+          endingWeight: null,
+          targetWeight: null,
+          weightChange: 0,
+          daysCompleted: 0,
+          daysIncomplete: 100,
+          completionPct: 0,
+          avgDurationMinutes: 0,
+          lastWorkout: null,
+          weeklyWeights: [memClient.startingWeight],
+          avatarUrl: memClient.avatarUrl || null,
+          registeredAt: memClient.registeredAt || memClient.createdAt,
+          formattedJoinedDate: regDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+          createdAt: memClient.createdAt,
+        });
+      }
     });
 
     return res.json({ success: true, clients: clientSummaries });
@@ -199,31 +237,83 @@ router.get('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = String(req.params.id);
 
-    const client: any = await prisma.client.findUnique({
-      where: { id },
-      include: {
-        challengeParticipants: {
-          include: {
-            challenge: true,
-            completions: {
-              include: {
-                workoutDay: true,
-                exerciseLogs: {
-                  include: { exercise: true },
+    let client: any = null;
+    try {
+      client = await prisma.client.findUnique({
+        where: { id },
+        include: {
+          challengeParticipants: {
+            include: {
+              challenge: true,
+              completions: {
+                include: {
+                  workoutDay: true,
+                  exerciseLogs: {
+                    include: { exercise: true },
+                  },
                 },
               },
             },
           },
+          weightLogs: {
+            orderBy: { date: 'asc' },
+          },
         },
-        weightLogs: {
-          orderBy: { date: 'asc' },
-        },
-      },
-    });
+      });
+    } catch (dbErr) {
+      console.warn('DB client query fallback to in-memory:', dbErr);
+    }
 
     if (!client) {
+      // Check in-memory fallback store
+      const memClient = Array.from(inMemoryRegisteredClients.values()).find((c) => c.id === id);
+      if (memClient) {
+        return res.json({
+          success: true,
+          client: {
+            id: memClient.id,
+            name: memClient.name,
+            phone: memClient.phone,
+            email: memClient.email,
+            avatarUrl: memClient.avatarUrl,
+            startingWeight: memClient.startingWeight,
+            currentWeight: memClient.currentWeight,
+            endingWeight: null,
+            status: memClient.status,
+            weightChange: 0,
+            registeredAt: memClient.registeredAt,
+            formattedRegisteredAt: new Date(memClient.registeredAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+            weightLogs: [{ date: memClient.registeredAt, weight: memClient.startingWeight, note: 'Day 1 Benchmark' }],
+            dayMatrix: Array.from({ length: 100 }, (_, i) => ({ dayNumber: i + 1, completed: false, details: null })),
+            totalCompleted: 0,
+            attendanceSummary: {
+              presentDays: 0,
+              absentDays: 0,
+              totalAttendanceRecorded: 0,
+              attendancePct: 100,
+            },
+          },
+        });
+      }
       return res.status(404).json({ success: false, error: 'Client not found' });
     }
+
+    // Query client attendance records
+    let attendances: any[] = [];
+    try {
+      attendances = await prisma.gymAttendance.findMany({
+        where: { clientId: client.id },
+        orderBy: { attendanceDate: 'desc' },
+      });
+    } catch (e) {}
+
+    const presentDays = attendances.filter((a: any) => a.status === 'present').length;
+    const absentDays = attendances.filter((a: any) => a.status === 'absent').length;
+    const totalAttendanceRecorded = attendances.length;
+    const attendancePct = totalAttendanceRecorded > 0 ? Math.round((presentDays / totalAttendanceRecorded) * 100) : 100;
+    const startW = client.startingWeight || 0;
+    const currW = client.currentWeight || startW;
+    const weightChange = startW > 0 ? Number((currW - startW).toFixed(1)) : 0;
 
     // Build 100-day matrix
     const completedDayNumbers = new Set<number>();
@@ -252,6 +342,8 @@ router.get('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
+    const regDate = client.registeredAt || client.createdAt;
+
     return res.json({
       success: true,
       client: {
@@ -259,18 +351,83 @@ router.get('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
         name: client.name,
         phone: client.phone,
         email: client.email,
+        avatarUrl: client.avatarUrl,
         startingWeight: client.startingWeight,
         currentWeight: client.currentWeight,
         endingWeight: client.endingWeight,
         status: client.status,
+        weightChange,
+        registeredAt: regDate,
+        formattedRegisteredAt: regDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
         weightLogs: client.weightLogs,
         dayMatrix,
         totalCompleted: completedDayNumbers.size,
+        attendanceSummary: {
+          presentDays,
+          absentDays,
+          totalAttendanceRecorded,
+          attendancePct,
+        },
       },
     });
   } catch (error: any) {
     console.error('Error fetching client details:', error);
     return res.status(500).json({ success: false, error: 'Failed to retrieve client details' });
+  }
+});
+
+/**
+ * GET /api/admin/notifications/registrations
+ * Real-time endpoint for new client onboarding alert notifications
+ */
+router.get('/notifications/registrations', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sinceQuery = req.query.since ? new Date(String(req.query.since)) : new Date(Date.now() - 3600 * 1000);
+
+    let recentClients: any[] = [];
+    try {
+      recentClients = await prisma.client.findMany({
+        where: {
+          registeredAt: { gte: sinceQuery },
+          startingWeight: { not: null },
+        },
+        orderBy: { registeredAt: 'desc' },
+        take: 10,
+      });
+    } catch (dbErr) {
+      console.warn('DB notifications query error:', dbErr);
+    }
+
+    // Include recent in-memory clients
+    inMemoryRegisteredClients.forEach((memClient) => {
+      const regDate = new Date(memClient.registeredAt || memClient.createdAt);
+      if (regDate >= sinceQuery && !recentClients.some((c) => c.googleId === memClient.googleId || c.id === memClient.id)) {
+        recentClients.unshift(memClient);
+      }
+    });
+
+    const formatted = recentClients.map((c: any) => {
+      const d = new Date(c.registeredAt || c.createdAt);
+      const timeStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
+        ', ' +
+        d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      return {
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        startingWeight: c.startingWeight,
+        currentWeight: c.currentWeight,
+        avatarUrl: c.avatarUrl,
+        registeredAt: c.registeredAt || c.createdAt,
+        formattedTime: timeStr,
+      };
+    });
+
+    return res.json({ success: true, newRegistrations: formatted, notifications: formatted });
+  } catch (error: any) {
+    console.error('Error fetching registration notifications:', error);
+    return res.status(500).json({ success: false, error: 'Failed to retrieve registration notifications' });
   }
 });
 

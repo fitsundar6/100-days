@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpha X Gym — Client Registration QR</title>
+  <meta name="description" content="Alpha X Gym official member registration QR terminal. Scan with any mobile device to create your athlete profile." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --bg-base: #060709;
+      --bg-surface: #0f1117;
+      --bg-card: #151821;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --red-primary: #e11d48;
+      --red-glow: rgba(225, 29, 72, 0.35);
+      --text-pure: #ffffff;
+      --text-primary: #e2e8f0;
+      --text-muted: #94a3b8;
+      --font-brand: 'Poppins', 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(225, 29, 72, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 10% 90%, rgba(225, 29, 72, 0.05) 0%, transparent 50%);
+      color: var(--text-pure);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 20px;
+    }
+
+    /* Terminal Header */
+    .terminal-header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(15, 17, 23, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #ffffff;
+      box-shadow: 0 4px 16px var(--red-glow);
+    }
+
+    .brand-name {
+      font-family: var(--font-brand);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-name span {
+      color: var(--red-primary);
+    }
+
+    .terminal-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    /* Central Scanning Terminal */
+    .terminal-body {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 24px auto;
+    }
+
+    .qr-hub-card {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: 28px;
+      padding: 36px 32px 32px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-hub-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #e11d48, #f43f5e, #e11d48);
+    }
+
+    .qr-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      border-radius: 30px;
+      color: #fda4af;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .qr-card-title {
+      font-family: var(--font-brand);
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .qr-card-title span {
+      color: var(--red-primary);
+    }
+
+    .qr-card-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 28px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* High-Contrast QR Code Frame */
+    .qr-frame {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 20px;
+      display: inline-block;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .qr-image {
+      width: 280px;
+      height: 280px;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .qr-loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 17, 23, 0.92);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-pure);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--red-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Target URL Pill Box */
+    .url-pill-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .url-text {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-copy-inline {
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      color: #fda4af;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-copy-inline:hover {
+      background: var(--red-primary);
+      color: #ffffff;
+    }
+
+    /* Action Buttons Grid */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .btn-action {
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-action--primary {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 14px var(--red-glow);
+    }
+
+    .btn-action--primary:hover {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      transform: translateY(-1px);
+    }
+
+    .btn-action--ghost {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-card);
+      color: var(--text-primary);
+    }
+
+    .btn-action--ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .btn-action--full {
+      grid-column: 1 / -1;
+    }
+
+    /* Terminal Footer Features */
+    .terminal-footer {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .feature-pill {
+      background: rgba(15, 17, 23, 0.6);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-pill i {
+      color: var(--red-primary);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      background: #10b981;
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.2s;
+      z-index: 9999;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Print Stylesheet for A4 Gym Poster */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+
+      .terminal-header,
+      .header-actions,
+      .url-pill-box,
+      .actions-grid,
+      .terminal-footer,
+      .toast {
+        display: none !important;
+      }
+
+      .terminal-body {
+        max-width: 100% !important;
+        margin: 0 !important;
+      }
+
+      .qr-hub-card {
+        background: #ffffff !important;
+        border: 2px solid #000000 !important;
+        box-shadow: none !important;
+        padding: 40px !important;
+      }
+
+      .qr-card-title {
+        color: #000000 !important;
+        font-size: 38px !important;
+      }
+
+      .qr-card-title span {
+        color: #e11d48 !important;
+      }
+
+      .qr-card-subtitle {
+        color: #333333 !important;
+        font-size: 16px !important;
+      }
+
+      .qr-frame {
+        border: 2px solid #000000 !important;
+        box-shadow: none !important;
+        padding: 24px !important;
+      }
+
+      .qr-image {
+        width: 380px !important;
+        height: 380px !important;
+      }
+
+      .print-poster-footer {
+        display: block !important;
+        margin-top: 30px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+      }
+    }
+
+    .print-poster-footer {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==============================================
+       TERMINAL HEADER
+  ============================================== -->
+  <header class="terminal-header">
+    <div class="brand-group">
+      <div class="brand-icon">
+        <i class="fa-solid fa-dumbbell"></i>
+      </div>
+      <div>
+        <div class="brand-name">Alpha <span>X</span> Gym</div>
+        <div class="terminal-badge">
+          <span class="status-dot"></span>
+          <span id="facilityNameDisplay">Main Facility — Reception Kiosk</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a href="/admin.html" class="btn-header" title="Return to Admin Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <button type="button" class="btn-header" id="btnFullscreen" title="Toggle Fullscreen">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       CENTRAL SCANNING TERMINAL
+  ============================================== -->
+  <main class="terminal-body">
+    <div class="qr-hub-card">
+      <div class="qr-badge">
+        <i class="fa-solid fa-user-plus"></i> New Client Registration
+      </div>
+
+      <h1 class="qr-card-title">SCAN TO JOIN<br /><span>ALPHA X GYM</span></h1>
+      <p class="qr-card-subtitle">
+        Scan this QR with your smartphone camera to create your official member profile, enter starting weight, and join our fitness protocol.
+      </p>
+
+      <!-- Large QR Code Frame -->
+      <div class="qr-frame">
+        <img id="qrImage" class="qr-image" alt="Alpha X Gym Client Registration QR Code" src="https://api.qrserver.com/v1/create-qr-code/?size=500x500&amp;margin=10&amp;data=https%3A%2F%2Fdc07ca2e087e5d.lhr.life%2Fregister" />
+        <div class="qr-loading-overlay" id="qrLoadingOverlay" style="display: none;">
+          <div class="spinner"></div>
+          <span style="font-size: 12px; font-weight: 600;">Generating Registration QR...</span>
+        </div>
+      </div>
+
+      <!-- Target URL Pill Box -->
+      <div class="url-pill-box">
+        <span class="url-text" id="urlDisplay">https://dc07ca2e087e5d.lhr.life/register</span>
+        <button type="button" class="btn-copy-inline" id="btnCopyUrl">
+          <i class="fa-solid fa-copy"></i> Copy Link
+        </button>
+      </div>
+
+      <!-- Action Buttons Grid -->
+      <div class="actions-grid">
+        <button type="button" class="btn-action btn-action--primary" id="btnDownloadQr">
+          <i class="fa-solid fa-download"></i> Download QR
+        </button>
+        <button type="button" class="btn-action btn-action--ghost" id="btnPrintQr">
+          <i class="fa-solid fa-print"></i> Print Poster
+        </button>
+        <a href="/register" target="_blank" class="btn-action btn-action--ghost btn-action--full" id="btnOpenRegister">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Registration Page
+        </a>
+      </div>
+
+      <!-- Print Poster Footer (Visible only during printing) -->
+      <div class="print-poster-footer">
+        <p>Alpha X Gym • Official Member Onboarding</p>
+        <p style="font-size: 12px; color: #555; margin-top: 4px;" id="printUrlDisplay">https://alphaxgym.com/register</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==============================================
+       BOTTOM FEATURE PILLS
+  ============================================== -->
+  <footer class="terminal-footer">
+    <div class="feature-pill">
+      <i class="fa-brands fa-google"></i>
+      <span>Fast Google Sign-In</span>
+    </div>
+    <div class="feature-pill">
+      <i class="fa-solid fa-fingerprint"></i>
+      <span>One Profile Per Google Account</span>
+    </div>
+    <div class="feature-pill">
+      <i class="fa-solid fa-weight-scale"></i>
+      <span>Benchmark Starting Weight</span>
+    </div>
+    <div class="feature-pill">
+      <i class="fa-solid fa-shield-check"></i>
+      <span>Immediate Dashboard Sync</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const qrImage = document.getElementById('qrImage');
+      const qrLoadingOverlay = document.getElementById('qrLoadingOverlay');
+      const urlDisplay = document.getElementById('urlDisplay');
+      const printUrlDisplay = document.getElementById('printUrlDisplay');
+      const facilityNameDisplay = document.getElementById('facilityNameDisplay');
+      const btnCopyUrl = document.getElementById('btnCopyUrl');
+      const btnDownloadQr = document.getElementById('btnDownloadQr');
+      const btnPrintQr = document.getElementById('btnPrintQr');
+      const btnFullscreen = document.getElementById('btnFullscreen');
+      const btnOpenRegister = document.getElementById('btnOpenRegister');
+
+      let currentQrDataUrl = '';
+      let currentRegistrationUrl = '';
+
+      function getApiUrl(path) {
+        const isFile = window.location.protocol === 'file:';
+        const isNotPort3000 = window.location.port && window.location.port !== '3000';
+        const base = (isFile || isNotPort3000) ? 'http://localhost:3000' : '';
+        return `${base}${path}`;
+      }
+
+      function getFallbackRegistrationUrl() {
+        if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+          return `${window.location.origin}/register`;
+        }
+        return 'https://dc07ca2e087e5d.lhr.life/register';
+      }
+
+      function applyInstantFallbackQr() {
+        const fallbackUrl = getFallbackRegistrationUrl();
+        const fallbackQrImg = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=10&data=${encodeURIComponent(fallbackUrl)}`;
+
+        currentRegistrationUrl = fallbackUrl;
+        currentQrDataUrl = fallbackQrImg;
+
+        if (qrImage) qrImage.src = fallbackQrImg;
+        if (urlDisplay) urlDisplay.textContent = fallbackUrl;
+        if (printUrlDisplay) printUrlDisplay.textContent = fallbackUrl;
+        if (btnOpenRegister) btnOpenRegister.href = fallbackUrl;
+        if (qrLoadingOverlay) qrLoadingOverlay.style.display = 'none';
+      }
+
+      function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${msg}</span>`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+
+      async function loadRegistrationQr() {
+        try {
+          const res = await fetch(getApiUrl('/api/registration/qr'));
+          if (!res.ok) throw new Error('Server returned HTTP ' + res.status);
+          const data = await res.json();
+
+          if (!data.success) throw new Error(data.error || 'Failed to generate QR');
+
+          currentQrDataUrl = data.qrDataUrl;
+          currentRegistrationUrl = data.registrationUrl;
+
+          qrImage.src = data.qrDataUrl;
+          urlDisplay.textContent = data.registrationUrl;
+          if (printUrlDisplay) printUrlDisplay.textContent = data.registrationUrl;
+          if (facilityNameDisplay && data.gymName) {
+            facilityNameDisplay.textContent = data.gymName;
+          }
+          if (btnOpenRegister) {
+            btnOpenRegister.href = data.registrationUrl;
+          }
+
+          if (qrLoadingOverlay) qrLoadingOverlay.style.display = 'none';
+        } catch (err) {
+          console.warn('Backend registration QR fetch notice (using instant fallback):', err.message);
+          applyInstantFallbackQr();
+          setTimeout(loadRegistrationQr, 5000);
+        }
+      }
+
+      // Copy URL
+      btnCopyUrl.addEventListener('click', async () => {
+        if (!currentRegistrationUrl) currentRegistrationUrl = getFallbackRegistrationUrl();
+        try {
+          await navigator.clipboard.writeText(currentRegistrationUrl);
+          showToast('Registration URL copied to clipboard!');
+        } catch (e) {
+          const input = document.createElement('input');
+          input.value = currentRegistrationUrl;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          input.remove();
+          showToast('Registration URL copied to clipboard!');
+        }
+      });
+
+      // Download QR Image (PNG)
+      btnDownloadQr.addEventListener('click', async () => {
+        if (!currentQrDataUrl) applyInstantFallbackQr();
+        try {
+          if (currentQrDataUrl.startsWith('data:')) {
+            const link = document.createElement('a');
+            link.download = 'AlphaXGym-Client-Registration-QR.png';
+            link.href = currentQrDataUrl;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          } else {
+            const resp = await fetch(currentQrDataUrl);
+            const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'AlphaXGym-Client-Registration-QR.png';
+            link.href = blobUrl;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(blobUrl);
+          }
+          showToast('Downloaded High-Res Registration QR PNG');
+        } catch (e) {
+          window.open(currentQrDataUrl, '_blank');
+          showToast('Opened QR in new tab');
+        }
+      });
+
+      // Print Poster
+      btnPrintQr.addEventListener('click', () => {
+        window.print();
+      });
+
+      // Fullscreen
+      btnFullscreen.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      // Initialize with instant display
+      applyInstantFallbackQr();
+      loadRegistrationQr();
+    })();
+  </script>
+</body>
+</html>
