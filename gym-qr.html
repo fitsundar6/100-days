@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpha X Gym — Live Attendance QR Terminal</title>
+  <meta name="description" content="Alpha X Gym dynamic attendance QR code display terminal for gym kiosks, TVs, monitors, and tablets." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="gym-qr.css" />
+</head>
+<body>
+
+  <!-- ==============================================
+       TOP TERMINAL STATUS BAR
+  ============================================== -->
+  <header class="terminal-header">
+    <div class="brand-group">
+      <div class="brand-icon">
+        <i class="fa-solid fa-dumbbell"></i>
+      </div>
+      <div>
+        <div class="brand-name">Alpha <span>X</span> Gym</div>
+        <div class="terminal-badge">
+          <span class="status-dot"></span>
+          <span id="facilityName">Alpha X Gym — Main Facility</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-group">
+      <div class="clock-display">
+        <div class="clock-time" id="clockTime">--:--:-- --</div>
+        <div class="clock-date" id="clockDate">-- --- ---- • IST</div>
+      </div>
+      <button type="button" class="btn-fullscreen" id="btnFullscreen" title="Toggle Fullscreen (F)">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       CENTRAL SCANNING TERMINAL
+  ============================================== -->
+  <main class="terminal-body">
+    <div class="qr-hub-card" id="qrCard">
+
+      <h1 class="qr-card-title">Scan to Check In</h1>
+      <p class="qr-card-subtitle">
+        Point your phone camera or QR scanner at the code below to mark today's gym attendance.
+      </p>
+
+      <!-- Large High-Contrast QR Code Frame -->
+      <div class="qr-frame">
+        <img id="qrImage" class="qr-image" alt="Alpha X Gym Live Check-in QR" src="" />
+        <div class="qr-loading-overlay" id="qrLoadingOverlay">
+          <div class="spinner"></div>
+          <span class="spinner-label">Generating Secure Dynamic Token...</span>
+        </div>
+      </div>
+
+      <!-- Token Validity Countdown -->
+      <div class="countdown-wrapper">
+        <div class="countdown-meta">
+          <span class="countdown-label">
+            <i class="fa-solid fa-shield-halved"></i> Token Validity
+          </span>
+          <span class="countdown-seconds" id="countdownSeconds">30s</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Auto-Refresh Notice -->
+      <div class="refresh-notice">
+        <i class="fa-solid fa-arrows-rotate fa-spin"></i>
+        <span>QR refreshes automatically every 30 seconds</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==============================================
+       BOTTOM SECURITY & ANTI-CHEAT BADGES
+  ============================================== -->
+  <footer class="terminal-footer">
+    <div class="security-pill">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span>Dynamic Token Protection</span>
+    </div>
+    <div class="security-pill">
+      <i class="fa-solid fa-location-dot"></i>
+      <span>GPS Geofence Verified</span>
+    </div>
+    <div class="security-pill">
+      <i class="fa-solid fa-user-check"></i>
+      <span>Authenticated Member ID</span>
+    </div>
+    <div class="security-pill">
+      <i class="fa-solid fa-ban"></i>
+      <span>Anti-Screenshot Protected</span>
+    </div>
+  </footer>
+
+  <script src="gym-qr.js"></script>
+</body>
+</html>

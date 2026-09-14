@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#070707" />
+  <title>Alpha X 100-Day Challenge — Today's Workout</title>
+
+  <!-- Google Fonts: Poppins (Brand) & Inter (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Public Challenge Stylesheet -->
+  <link rel="stylesheet" href="challenge-style.css" />
+</head>
+<body>
+
+  <!-- Atmospheric Dark Fitness Background -->
+  <div class="axg-bg-wrapper"></div>
+
+  <!-- Main Mobile-First Challenge App Container -->
+  <div class="axg-challenge-app" id="home">
+
+    <!-- 1. TOP BRAND HEADER -->
+    <header class="axg-client-nav">
+      <a href="#home" class="axg-brand-chip">
+        <div class="axg-brand-chip__icon">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="axg-brand-chip__text">
+          <div class="axg-brand-chip__title">ALPHA <span>X</span></div>
+          <div class="axg-brand-chip__sub">Gym &bull; Performance</div>
+        </div>
+      </a>
+      <div class="axg-client-profile-badge">
+        <i class="fa-solid fa-circle"></i>
+        <span id="clientNameHeader">Athlete Mode</span>
+      </div>
+    </header>
+
+    <!-- 2. HERO & LANDING SCREEN (SPEC SECTION 1) -->
+    <section class="axg-hero-card">
+      <div class="axg-hero-badge">
+        <i class="fa-solid fa-fire"></i> 100-Day Transformation
+      </div>
+      <h1 class="axg-hero-title">ALPHA X 100-DAY CHALLENGE</h1>
+      <p class="axg-hero-desc">
+        Complete today's workout. Track your performance. Build your consistency.
+      </p>
+
+      <!-- Challenge Metrics Grid -->
+      <div class="axg-hero-stats-grid">
+        <div class="axg-hero-stat-card">
+          <div class="axg-hero-stat-card__val accent">DAY 12</div>
+          <div class="axg-hero-stat-card__lbl">of 100 Days</div>
+        </div>
+        <div class="axg-hero-stat-card">
+          <div class="axg-hero-stat-card__val green">12</div>
+          <div class="axg-hero-stat-card__lbl">Workouts Done</div>
+        </div>
+        <div class="axg-hero-stat-card">
+          <div class="axg-hero-stat-card__val">88</div>
+          <div class="axg-hero-stat-card__lbl">Remaining</div>
+        </div>
+      </div>
+
+      <!-- Challenge Progress Bar -->
+      <div class="axg-progress-wrapper">
+        <div class="axg-progress-meta">
+          <span>Overall Challenge Progress</span>
+          <span>12% Completed</span>
+        </div>
+        <div class="axg-progress-track">
+          <div class="axg-progress-fill" style="width: 12%;"></div>
+        </div>
+      </div>
+
+      <!-- Prominent Start Button -->
+      <a href="#workoutSection" class="axg-btn-hero-start" id="btnHeroStartWorkout">
+        <i class="fa-solid fa-play"></i> START TODAY'S WORKOUT
+      </a>
+
+      <!-- 2.5 DAILY DISCIPLINE STATUS (ATTENDANCE & WORKOUT SYNC - PART 9) -->
+      <div class="axg-discipline-card" id="disciplineStatusCard">
+        <div class="axg-discipline-header">
+          <span class="axg-discipline-badge">
+            <i class="fa-solid fa-shield-halved"></i> DAILY DISCIPLINE AUDIT
+          </span>
+          <span class="axg-discipline-date" id="disciplineDateDisplay">Today's Protocol</span>
+        </div>
+
+        <div class="axg-discipline-grid">
+          <!-- Attendance Track -->
+          <div class="axg-discipline-pill" id="pillAttendance">
+            <div class="axg-discipline-pill__icon green" id="iconAttendance">
+              <i class="fa-solid fa-clipboard-user"></i>
+            </div>
+            <div class="axg-discipline-pill__info">
+              <span class="axg-discipline-pill__label">FACILITY ATTENDANCE</span>
+              <span class="axg-discipline-pill__value text-green" id="valAttendanceStatus">🟢 PRESENT</span>
+              <span class="axg-discipline-pill__sub" id="subAttendanceDetail">Verified via Dynamic QR + GPS Geofence</span>
+            </div>
+          </div>
+
+          <!-- Workout Track -->
+          <div class="axg-discipline-pill" id="pillWorkout">
+            <div class="axg-discipline-pill__icon yellow" id="iconWorkout">
+              <i class="fa-solid fa-dumbbell"></i>
+            </div>
+            <div class="axg-discipline-pill__info">
+              <span class="axg-discipline-pill__label">PRESCRIBED WORKOUT</span>
+              <span class="axg-discipline-pill__value text-yellow" id="valWorkoutStatus">🟡 NOT STARTED</span>
+              <span class="axg-discipline-pill__sub" id="subWorkoutDetail">Chest &amp; Triceps &bull; 5 Exercises</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="axg-discipline-footer">
+          <i class="fa-solid fa-circle-info"></i>
+          <span><strong>Independent Verification:</strong> Physical gym attendance (PRESENT) and prescribed workout completion are validated as separate discipline metrics.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. STICKY WORKOUT TIME BANNER (SPEC SECTION 6) -->
+    <div class="axg-timer-banner" id="workoutTimerBanner">
+      <div class="axg-timer-display-group">
+        <div class="axg-timer-icon-wrap">
+          <i class="fa-solid fa-stopwatch"></i>
+        </div>
+        <div class="axg-timer-details">
+          <span class="axg-timer-label">Workout Time</span>
+          <span class="axg-timer-clock" id="workoutTimerClock">00:00:00</span>
+        </div>
+      </div>
+      <div class="axg-timer-controls">
+        <button type="button" class="axg-btn-timer axg-btn-timer--primary" id="btnWorkoutTimerToggle">
+          <i class="fa-solid fa-play"></i> Start
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. TODAY'S WORKOUT SECTION (SPEC SECTIONS 2, 3, 4) -->
+    <section class="axg-workout-section" id="workoutSection">
+      <div class="axg-section-head">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-dumbbell"></i> TODAY'S WORKOUT</h2>
+          <div class="axg-section-sub">DAY 12 &bull; Chest &amp; Triceps Hypertrophy</div>
+        </div>
+        <div class="axg-exercise-counter-badge" id="exerciseCountDisplay">
+          <span>0</span> / 5 Completed
+        </div>
+      </div>
+
+      <!-- Global Completion Progress Bar -->
+      <div class="axg-completion-bar-card">
+        <div class="axg-completion-bar-info">
+          <span id="exerciseCompletionText">0 / 5 Exercises Completed (0%)</span>
+          <span style="color: var(--text-muted); font-size: 11px;">Target: 100%</span>
+        </div>
+        <div class="axg-completion-bar-track">
+          <div class="axg-completion-bar-fill" id="exerciseCompletionFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Dynamic Exercises Container -->
+      <div id="exercisesList" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Rendered dynamically by challenge-ui.js -->
+      </div>
+    </section>
+
+    <!-- 5. REST TIMER WIDGET (SPEC SECTION 5) -->
+    <section class="axg-rest-timer-card" id="restTimerCard">
+      <div id="timerSection"></div>
+      <div class="axg-section-head" style="border:none; justify-content:center; text-align:center;">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-stopwatch-20"></i> REST TIMER</h2>
+          <div class="axg-section-sub">Recover between sets for optimal strength output</div>
+        </div>
+      </div>
+
+      <div class="axg-rest-timer-clock-wrap">
+        <div class="axg-rest-clock" id="restClockDisplay">01:00</div>
+        <div class="axg-rest-alarm-msg" id="restAlarmMsg">
+          <i class="fa-solid fa-fire"></i> REST COMPLETE! READY FOR NEXT SET
+        </div>
+      </div>
+
+      <!-- Presets -->
+      <div class="axg-rest-presets">
+        <button type="button" class="axg-preset-chip" data-seconds="30">30 sec</button>
+        <button type="button" class="axg-preset-chip" data-seconds="45">45 sec</button>
+        <button type="button" class="axg-preset-chip active" data-seconds="60">60 sec</button>
+        <button type="button" class="axg-preset-chip" data-seconds="90">90 sec</button>
+        <button type="button" class="axg-preset-chip" data-seconds="120">120 sec</button>
+        <button type="button" class="axg-preset-chip" data-seconds="180">180 sec</button>
+        <button type="button" class="axg-preset-chip" data-custom="true">Custom</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="axg-rest-actions">
+        <button type="button" class="axg-btn-rest axg-btn-rest--start" id="btnRestStart">
+          <i class="fa-solid fa-play"></i> Start
+        </button>
+        <button type="button" class="axg-btn-rest axg-btn-rest--pause" id="btnRestPause">
+          <i class="fa-solid fa-pause"></i> Pause
+        </button>
+        <button type="button" class="axg-btn-rest axg-btn-rest--reset" id="btnRestReset">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+      </div>
+    </section>
+
+    <!-- 6. 1RM CALCULATOR (SPEC SECTION 7) -->
+    <section class="axg-calc-card" id="toolsSection">
+      <div class="axg-section-head">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-calculator"></i> 1RM CALCULATOR</h2>
+          <div class="axg-section-sub">Epley formula: One-Rep Max estimation tool</div>
+        </div>
+      </div>
+
+      <div class="axg-calc-grid">
+        <div class="axg-calc-group">
+          <label for="calcWeightInput">Weight Lifted (KG)</label>
+          <input type="number" id="calcWeightInput" class="axg-calc-input" value="80" step="0.5" min="1" />
+        </div>
+        <div class="axg-calc-group">
+          <label for="calcRepsInput">Reps Completed</label>
+          <input type="number" id="calcRepsInput" class="axg-calc-input" value="8" step="1" min="1" max="30" />
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <button type="button" class="axg-btn-rest axg-btn-rest--start" id="btnCalculate1RM" style="width: 100%; max-width: 320px;">
+          <i class="fa-solid fa-calculator"></i> CALCULATE 1RM
+        </button>
+      </div>
+
+      <div class="axg-calc-result-box">
+        <div class="axg-calc-result-box__label">Estimated 1RM</div>
+        <div class="axg-calc-result-box__val" id="calcResultVal">101.3 kg</div>
+        <p class="axg-calc-disclaimer">
+          *Estimated 1RM only based on the Epley formula: <code>Weight &times; (1 + Reps/30)</code>. Actual 1RM may vary.
+        </p>
+
+        <!-- Percentages Breakdown -->
+        <div class="axg-calc-percent-grid">
+          <div class="axg-calc-percent-card">
+            <div class="axg-calc-percent-pct">95% (~2 reps)</div>
+            <div class="axg-calc-percent-kg" id="pct95">96.2 kg</div>
+          </div>
+          <div class="axg-calc-percent-card">
+            <div class="axg-calc-percent-pct">85% (~5 reps)</div>
+            <div class="axg-calc-percent-kg" id="pct85">86.1 kg</div>
+          </div>
+          <div class="axg-calc-percent-card">
+            <div class="axg-calc-percent-pct">75% (~9 reps)</div>
+            <div class="axg-calc-percent-kg" id="pct75">76.0 kg</div>
+          </div>
+          <div class="axg-calc-percent-card">
+            <div class="axg-calc-percent-pct">65% (~12 reps)</div>
+            <div class="axg-calc-percent-kg" id="pct65">65.8 kg</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. WORKOUT REWARDS & PROGRESS (SPEC SECTIONS 8, 9) -->
+    <section class="axg-rewards-card" id="rewardsSection">
+      <div class="axg-section-head">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-award"></i> TODAY'S REWARD</h2>
+          <div class="axg-section-sub">Milestone achievement badges unlocked by consistency</div>
+        </div>
+      </div>
+
+      <!-- Next Reward Meter -->
+      <div class="axg-next-reward-box">
+        <div class="axg-next-reward-header">
+          <span><i class="fa-solid fa-trophy"></i> Next Milestone: 30-DAY WARRIOR</span>
+          <span>23 / 30 Days</span>
+        </div>
+        <div class="axg-progress-track">
+          <div class="axg-progress-fill" style="width: 76.6%;"></div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
+          🔥 <strong>7 more completed days</strong> to unlock the prestigious 30-Day Warrior Badge!
+        </p>
+      </div>
+
+      <!-- Badge Showcase -->
+      <div class="axg-badge-showcase">
+        <div class="axg-badge-item">
+          <div class="axg-badge-icon gold">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <div class="axg-badge-info">
+            <h4>Day 7 &bull; Consistency Badge</h4>
+            <p>Unlocked &bull; 7 consecutive gym sessions completed</p>
+          </div>
+        </div>
+
+        <div class="axg-badge-item">
+          <div class="axg-badge-icon gold">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="axg-badge-info">
+            <h4>Day 14 &bull; Discipline Badge</h4>
+            <p>In Progress &bull; Unlocks upon finishing Day 14</p>
+          </div>
+        </div>
+
+        <div class="axg-badge-item">
+          <div class="axg-badge-icon locked">
+            <i class="fa-solid fa-khanda"></i>
+          </div>
+          <div class="axg-badge-info">
+            <h4>Day 30 &bull; Warrior Badge</h4>
+            <p>Locked &bull; Requires 30 completed workouts</p>
+          </div>
+        </div>
+
+        <div class="axg-badge-item">
+          <div class="axg-badge-icon locked">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div class="axg-badge-info">
+            <h4>Day 100 &bull; Alpha X Finisher</h4>
+            <p>Ultimate Milestone &bull; Lifetime transformation award</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. PERFORMANCE & PERSONAL RECORDS (SPEC SECTIONS 10, 11) -->
+    <section class="axg-calc-card">
+      <div class="axg-section-head">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-chart-line"></i> MY PERFORMANCE</h2>
+          <div class="axg-section-sub">Real-time workout metrics &amp; cumulative volume</div>
+        </div>
+      </div>
+
+      <div class="axg-performance-grid">
+        <div class="axg-perf-stat-card">
+          <div class="axg-perf-stat-card__val">12</div>
+          <div class="axg-perf-stat-card__lbl">Workouts</div>
+        </div>
+        <div class="axg-perf-stat-card">
+          <div class="axg-perf-stat-card__val red">5 Days 🔥</div>
+          <div class="axg-perf-stat-card__lbl">Streak</div>
+        </div>
+        <div class="axg-perf-stat-card">
+          <div class="axg-perf-stat-card__val" id="perfTotalSets">17</div>
+          <div class="axg-perf-stat-card__lbl">Total Sets</div>
+        </div>
+        <div class="axg-perf-stat-card">
+          <div class="axg-perf-stat-card__val" id="perfTotalReps">156</div>
+          <div class="axg-perf-stat-card__lbl">Total Reps</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px; background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block;">
+            Total Weight Lifted Today
+          </span>
+          <span style="font-size: 11px; color: var(--text-dim);">
+            Calculated as &Sigma;(Weight &times; Reps) across all sets
+          </span>
+        </div>
+        <div class="axg-perf-stat-card__val red" id="perfTotalVolume" style="font-size: 24px;">
+          10,850 kg
+        </div>
+      </div>
+
+      <!-- Personal Records -->
+      <div style="margin-top: 20px;">
+        <h3 style="font-family: var(--font-brand); font-size: 15px; font-weight: 800; color: var(--text-pure); margin-bottom: 8px;">
+          <i class="fa-solid fa-trophy" style="color: var(--gold);"></i> MY PERSONAL RECORDS
+        </h3>
+        <div class="axg-pr-list" id="prListContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. TODAY'S RULES (SPEC SECTION 12) -->
+    <section class="axg-rules-card">
+      <h3 style="font-family: var(--font-brand); font-size: 15px; font-weight: 800; color: var(--text-pure); display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-clipboard-check" style="color: var(--red);"></i> TODAY'S RULES
+      </h3>
+      <ul class="axg-rules-list">
+        <li><i class="fa-solid fa-circle-check"></i> Complete all required exercises with correct form</li>
+        <li><i class="fa-solid fa-circle-check"></i> Record your weight (kg) and actual reps per set</li>
+        <li><i class="fa-solid fa-circle-check"></i> Take recommended 60–90 sec rest between compound sets</li>
+        <li><i class="fa-solid fa-circle-check"></i> Press Finish Workout and confirm submission before leaving gym</li>
+      </ul>
+    </section>
+
+    <!-- 10. FINISH WORKOUT SECTION (SPEC SECTION 13) -->
+    <section class="axg-finish-section">
+      <h3 style="font-family: var(--font-brand); font-size: 18px; font-weight: 900; color: var(--text-pure); margin-bottom: 8px;">
+        COMPLETE TODAY'S CHALLENGE
+      </h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        Make sure you have logged your sets and marked completed exercises before submitting.
+      </p>
+      <button type="button" class="axg-btn-finish" id="btnFinishWorkout" disabled>
+        <i class="fa-solid fa-flag-checkered"></i> 🔥 FINISH WORKOUT
+      </button>
+    </section>
+
+    <!-- 11. WORKOUT HISTORY PREVIEW (SPEC SECTION 15) -->
+    <section class="axg-calc-card">
+      <div class="axg-section-head">
+        <div class="axg-section-title-group">
+          <h2><i class="fa-solid fa-clock-rotate-left"></i> WORKOUT HISTORY</h2>
+          <div class="axg-section-sub">Your recent completed transformation sessions</div>
+        </div>
+      </div>
+
+      <div class="axg-history-list">
+        <div class="axg-history-row">
+          <div>
+            <div class="axg-history-day-title">Day 12 &bull; Chest &amp; Triceps</div>
+            <div class="axg-history-day-sub">Today &bull; Active Workout Session</div>
+          </div>
+          <div class="axg-history-stats">
+            <span class="axg-history-status-badge" style="color: var(--yellow); background: var(--yellow-dim);">In Progress</span>
+          </div>
+        </div>
+
+        <div class="axg-history-row">
+          <div>
+            <div class="axg-history-day-title">Day 11 &bull; Back &amp; Biceps</div>
+            <div class="axg-history-day-sub">Yesterday &bull; 41 min &bull; 5 Exercises</div>
+          </div>
+          <div class="axg-history-stats">
+            <span class="axg-history-status-badge">Completed</span>
+          </div>
+        </div>
+
+        <div class="axg-history-row">
+          <div>
+            <div class="axg-history-day-title">Day 10 &bull; Leg Hypertrophy &amp; Core</div>
+            <div class="axg-history-day-sub">2 days ago &bull; 48 min &bull; 6 Exercises</div>
+          </div>
+          <div class="axg-history-stats">
+            <span class="axg-history-status-badge">Completed</span>
+          </div>
+        </div>
+
+        <div class="axg-history-row">
+          <div>
+            <div class="axg-history-day-title">Day 9 &bull; Active Recovery Day</div>
+            <div class="axg-history-day-sub">Rest Day &bull; Mobility &amp; 10k Steps</div>
+          </div>
+          <div class="axg-history-stats">
+            <span class="axg-history-status-badge" style="color: var(--blue); background: var(--blue-dim);">Rest Day 🛌</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /axg-challenge-app -->
+
+  <!-- 12. MOBILE STICKY BOTTOM BAR (SPEC SECTION 16) -->
+  <nav class="axg-bottom-bar">
+    <a href="#home" class="axg-bottom-nav-item active">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="#workoutSection" class="axg-bottom-nav-item">
+      <i class="fa-solid fa-fire"></i>
+      <span>Workout</span>
+    </a>
+    <a href="#timerSection" class="axg-bottom-nav-item">
+      <i class="fa-solid fa-stopwatch"></i>
+      <span>Timer</span>
+    </a>
+    <a href="#toolsSection" class="axg-bottom-nav-item">
+      <i class="fa-solid fa-calculator"></i>
+      <span>1RM</span>
+    </a>
+    <a href="#rewardsSection" class="axg-bottom-nav-item">
+      <i class="fa-solid fa-award"></i>
+      <span>Rewards</span>
+    </a>
+  </nav>
+
+  <!-- 13. CONFIRMATION MODAL (SPEC SECTION 13) -->
+  <div class="axg-modal-overlay" id="confirmFinishModal" style="display: none;">
+    <div class="axg-modal">
+      <div class="axg-modal__header">
+        <h3 class="axg-modal__title">Confirm Workout Submission</h3>
+        <button type="button" class="axg-modal__close" onclick="document.getElementById('confirmFinishModal').style.display='none'">&times;</button>
+      </div>
+      <div class="axg-modal__body">
+        <p style="font-size: 15px; color: var(--text-pure); margin-bottom: 12px; font-weight: 700;">
+          Are you sure you have completed today's workout?
+        </p>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+          Your sets, reps, weight volume, and workout duration will be saved to your athlete record.
+        </p>
+      </div>
+      <div class="axg-modal__footer">
+        <button type="button" class="axg-btn-rest axg-btn-rest--pause" id="btnConfirmFinishCancel">Cancel</button>
+        <button type="button" class="axg-btn-rest axg-btn-rest--start" id="btnConfirmFinishYes">
+          <i class="fa-solid fa-check"></i> Finish Workout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. WORKOUT COMPLETION CELEBRATION MODAL (SPEC SECTION 14) -->
+  <div class="axg-modal-overlay" id="celebrationModal" style="display: none;">
+    <div class="axg-modal">
+      <div class="axg-modal__body axg-celebration-content">
+        <div class="axg-trophy-icon">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="axg-celebration-title">🎉 WORKOUT COMPLETE!</h2>
+        <p class="axg-celebration-sub">DAY 12 COMPLETED &bull; ALPHA X GYM</p>
+
+        <!-- Stats Breakdown -->
+        <div class="axg-celebration-stats-grid">
+          <div class="axg-celeb-card">
+            <div class="axg-celeb-card__val" id="celebDuration">36:42</div>
+            <div class="axg-celeb-card__lbl">Workout Time</div>
+          </div>
+          <div class="axg-celeb-card">
+            <div class="axg-celeb-card__val" id="celebSets">18 sets</div>
+            <div class="axg-celeb-card__lbl">Sets Logged</div>
+          </div>
+          <div class="axg-celeb-card">
+            <div class="axg-celeb-card__val" id="celebReps">142</div>
+            <div class="axg-celeb-card__lbl">Total Reps</div>
+          </div>
+          <div class="axg-celeb-card">
+            <div class="axg-celeb-card__val" id="celebVolume">12,850 kg</div>
+            <div class="axg-celeb-card__lbl">Total Volume</div>
+          </div>
+        </div>
+
+        <!-- Reward Badge Unlocked -->
+        <div style="background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px; text-align: center;">
+          <span style="font-size: 11px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+            🏆 REWARD UNLOCKED
+          </span>
+          <strong style="font-size: 15px; color: var(--text-pure);">"12-Day Consistency Badge"</strong>
+        </div>
+
+        <!-- Button to View Progress / Close -->
+        <button type="button" class="axg-btn-finish" id="btnCloseCelebration" style="font-size: 15px; padding: 14px 24px;">
+          <i class="fa-solid fa-chart-line"></i> VIEW MY PROGRESS
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Challenge UI Controller -->
+  <script src="challenge-ui.js"></script>
+</body>
+</html>

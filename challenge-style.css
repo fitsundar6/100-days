@@ -1,0 +1,1674 @@
+/* ============================================================
+   ALPHA X GYM — PUBLIC CHALLENGE & CLIENT WORKOUT PAGE
+   Mobile-First Premium Dark Fitness Application Stylesheet
+   Theme: Obsidian Charcoal + Alpha X Crimson Red Accent
+   ============================================================ */
+
+/* --- 1. DESIGN SYSTEM TOKENS ------------------------------- */
+:root {
+  /* Brand Colors */
+  --red:              #E8000D;
+  --red-hover:        #FF1A27;
+  --red-dark:         #B00009;
+  --red-dim:          rgba(232, 0, 13, 0.12);
+  --red-glow:         rgba(232, 0, 13, 0.32);
+  --red-border:       rgba(232, 0, 13, 0.4);
+
+  /* Obsidian & Charcoal Surfaces */
+  --black:            #070707;
+  --surface-0:        #0B0B0B;
+  --surface-1:        #121212;
+  --surface-2:        #181818;
+  --surface-3:        #222222;
+  --surface-card:     rgba(18, 18, 18, 0.88);
+  --surface-glass:    rgba(14, 14, 14, 0.78);
+  --surface-overlay:  rgba(0, 0, 0, 0.85);
+
+  /* Borders & Dividers */
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+  --border-card:      rgba(255, 255, 255, 0.12);
+  --border-hover:     rgba(255, 255, 255, 0.22);
+  --border-focus:     rgba(232, 0, 13, 0.6);
+
+  /* Typography Colors */
+  --text-pure:        #FFFFFF;
+  --text-primary:     #F3F3F3;
+  --text-muted:       #9E9E9E;
+  --text-dim:         #686868;
+
+  /* Accents & Status */
+  --green:            #22C55E;
+  --green-dim:        rgba(34, 197, 94, 0.15);
+  --green-border:     rgba(34, 197, 94, 0.35);
+  --blue:             #38BDF8;
+  --blue-dim:         rgba(56, 189, 248, 0.15);
+  --yellow:           #F59E0B;
+  --yellow-dim:       rgba(245, 158, 11, 0.15);
+  --gold:             #FFD700;
+  --gold-dim:         rgba(255, 215, 0, 0.15);
+
+  /* Fonts */
+  --font-brand:       'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-ui:          'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Radii & Shadows */
+  --radius-sm:        8px;
+  --radius-md:        12px;
+  --radius-lg:        16px;
+  --radius-xl:        22px;
+  --radius-full:      9999px;
+
+  --shadow-card:      0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow:      0 0 24px rgba(232, 0, 13, 0.3);
+  --shadow-sticky:    0 -4px 20px rgba(0, 0, 0, 0.7);
+
+  --backdrop-blur:    blur(16px);
+  --ease:             all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- 2. BASE STYLES & RESET --------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--black);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 84px; /* Space for mobile sticky bottom bar */
+}
+
+/* Atmospheric Dark Fitness Background */
+.axg-bg-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 0, 13, 0.08), transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.02), transparent 40%),
+    linear-gradient(180deg, rgba(7, 7, 7, 0.88) 0%, rgba(7, 7, 7, 0.96) 100%),
+    url('images/gym-background.jpg') center/cover no-repeat;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Grid & Layout Wrapper */
+.axg-challenge-app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .axg-challenge-app {
+    padding: 28px 24px;
+    gap: 28px;
+  }
+  body {
+    padding-bottom: 32px;
+  }
+}
+
+/* --- 3. TOP NAVIGATION / BRAND HEADER ---------------------- */
+.axg-client-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--surface-glass);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.axg-brand-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.axg-brand-chip__icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--red), var(--red-dark));
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-pure);
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(232, 0, 13, 0.35);
+}
+
+.axg-brand-chip__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.axg-brand-chip__title {
+  font-family: var(--font-brand);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text-pure);
+  line-height: 1.1;
+}
+
+.axg-brand-chip__title span {
+  color: var(--red);
+}
+
+.axg-brand-chip__sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.axg-client-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.axg-client-profile-badge i {
+  color: var(--green);
+  font-size: 10px;
+}
+
+/* --- 4. HERO & LANDING SCREEN (SECTION 1) ------------------- */
+.axg-hero-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(24, 24, 24, 0.9) 0%, rgba(14, 14, 14, 0.95) 100%),
+              url('images/gym-hero.jpg') center/cover no-repeat;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 28px 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .axg-hero-card {
+    padding: 40px 32px;
+  }
+}
+
+.axg-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+}
+
+.axg-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--red-dim);
+  border: 1px solid var(--red-border);
+  color: var(--red-hover);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.axg-hero-title {
+  font-family: var(--font-brand);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--text-pure);
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 600px) {
+  .axg-hero-title {
+    font-size: 34px;
+  }
+}
+
+.axg-hero-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+/* Progress & Day Metrics */
+.axg-hero-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.axg-hero-stat-card {
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.axg-hero-stat-card__val {
+  font-family: var(--font-brand);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-pure);
+  line-height: 1.1;
+}
+
+.axg-hero-stat-card__val.accent {
+  color: var(--red-hover);
+}
+
+.axg-hero-stat-card__val.green {
+  color: var(--green);
+}
+
+.axg-hero-stat-card__lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* Progress Bar */
+.axg-progress-wrapper {
+  margin-bottom: 24px;
+}
+
+.axg-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.axg-progress-meta span:last-child {
+  color: var(--red-hover);
+}
+
+.axg-progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.axg-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red-dark), var(--red));
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 12px rgba(232, 0, 13, 0.5);
+}
+
+/* Big Start Button */
+.axg-btn-hero-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 380px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  color: var(--text-pure);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px 24px;
+  font-family: var(--font-brand);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition: var(--ease);
+  text-decoration: none;
+}
+
+.axg-btn-hero-start:hover {
+  background: linear-gradient(135deg, var(--red-hover) 0%, var(--red) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(232, 0, 13, 0.55);
+}
+
+.axg-btn-hero-start:active {
+  transform: translateY(0);
+}
+
+/* --- 5. WORKOUT TIME BANNER (SECTION 6) -------------------- */
+.axg-timer-banner {
+  background: var(--surface-glass);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  transition: var(--ease);
+}
+
+.axg-timer-banner.active {
+  border-color: var(--red-border);
+  box-shadow: 0 4px 24px rgba(232, 0, 13, 0.2);
+}
+
+.axg-timer-display-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.axg-timer-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--red-hover);
+}
+
+.axg-timer-banner.active .axg-timer-icon-wrap {
+  background: var(--red-dim);
+  border-color: var(--red-border);
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 0, 13, 0.4); }
+  70% { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(232, 0, 13, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 0, 13, 0); }
+}
+
+.axg-timer-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.axg-timer-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.axg-timer-clock {
+  font-family: var(--font-brand);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-pure);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.axg-timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.axg-btn-timer {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.axg-btn-timer:hover {
+  background: var(--surface-3);
+  border-color: var(--border-hover);
+}
+
+.axg-btn-timer--primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--text-pure);
+}
+
+.axg-btn-timer--primary:hover {
+  background: var(--red-hover);
+}
+
+/* --- 6. TODAY'S WORKOUT SECTION (SECTIONS 2, 3, 4) ---------- */
+.axg-workout-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.axg-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+}
+
+.axg-section-title-group h2 {
+  font-family: var(--font-brand);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-pure);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.axg-section-title-group h2 i {
+  color: var(--red);
+}
+
+.axg-section-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.axg-exercise-counter-badge {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.axg-exercise-counter-badge span {
+  color: var(--green);
+}
+
+/* Global Exercise Completion Bar */
+.axg-completion-bar-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.axg-completion-bar-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.axg-completion-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.axg-completion-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #4ADE80);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+
+/* Exercise Cards */
+.axg-exercise-card {
+  background: var(--surface-card);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 20px 16px;
+  box-shadow: var(--shadow-card);
+  transition: var(--ease);
+  position: relative;
+}
+
+@media (min-width: 600px) {
+  .axg-exercise-card {
+    padding: 24px;
+  }
+}
+
+.axg-exercise-card.completed {
+  border-color: var(--green-border);
+  background: rgba(18, 26, 20, 0.85);
+}
+
+.axg-exercise-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.axg-exercise-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.axg-exercise-idx {
+  width: 32px;
+  height: 32px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--red-hover);
+  flex-shrink: 0;
+}
+
+.axg-exercise-card.completed .axg-exercise-idx {
+  background: var(--green-dim);
+  border-color: var(--green-border);
+  color: var(--green);
+}
+
+.axg-exercise-name {
+  font-family: var(--font-brand);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-pure);
+  line-height: 1.2;
+}
+
+.axg-exercise-target {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.axg-exercise-target span {
+  color: var(--red-hover);
+  font-weight: 600;
+}
+
+.axg-exercise-complete-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.axg-exercise-complete-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.axg-exercise-complete-btn.active {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* Set Logging Table / List */
+.axg-sets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.axg-set-row {
+  display: grid;
+  grid-template-columns: 68px 1fr 1fr 38px;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  transition: var(--ease);
+}
+
+@media (min-width: 500px) {
+  .axg-set-row {
+    grid-template-columns: 80px 1fr 1fr 44px;
+    gap: 12px;
+    padding: 10px 14px;
+  }
+}
+
+.axg-set-badge {
+  font-family: var(--font-brand);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.axg-input-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.axg-set-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-pure);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 30px 8px 10px;
+  text-align: center;
+  outline: none;
+  transition: var(--ease);
+}
+
+.axg-set-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(232, 0, 13, 0.2);
+}
+
+.axg-input-suffix {
+  position: absolute;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.axg-btn-remove-set {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--ease);
+}
+
+.axg-btn-remove-set:hover {
+  color: var(--red-hover);
+  background: var(--red-dim);
+}
+
+/* Add Set Button */
+.axg-btn-add-set {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-hover);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--ease);
+}
+
+.axg-btn-add-set:hover {
+  border-color: var(--red);
+  color: var(--red-hover);
+  background: var(--surface-3);
+}
+
+/* --- 7. REST TIMER WIDGET (SECTION 5) ----------------------- */
+.axg-rest-timer-card {
+  background: var(--surface-card);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 24px 18px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.axg-rest-timer-card.alarm {
+  border-color: var(--red-hover);
+  box-shadow: 0 0 30px rgba(232, 0, 13, 0.4);
+}
+
+.axg-rest-timer-clock-wrap {
+  margin: 16px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.axg-rest-clock {
+  font-family: var(--font-brand);
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--text-pure);
+  line-height: 1;
+}
+
+.axg-rest-clock.running {
+  color: var(--red-hover);
+}
+
+.axg-rest-alarm-msg {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: var(--red);
+  color: var(--text-pure);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  margin-top: 10px;
+  animation: bounce 0.6s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+.axg-rest-presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.axg-preset-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--ease);
+}
+
+.axg-preset-chip:hover {
+  border-color: var(--border-hover);
+}
+
+.axg-preset-chip.active {
+  background: var(--red-dim);
+  border-color: var(--red-border);
+  color: var(--red-hover);
+}
+
+.axg-rest-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.axg-btn-rest {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-brand);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: var(--ease);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.axg-btn-rest--start {
+  background: var(--red);
+  color: var(--text-pure);
+  box-shadow: var(--shadow-glow);
+}
+
+.axg-btn-rest--start:hover {
+  background: var(--red-hover);
+}
+
+.axg-btn-rest--pause {
+  background: var(--surface-2);
+  border: 1px solid var(--border-hover);
+  color: var(--text-primary);
+}
+
+.axg-btn-rest--pause:hover {
+  background: var(--surface-3);
+}
+
+.axg-btn-rest--reset {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 12px 16px;
+}
+
+.axg-btn-rest--reset:hover {
+  color: var(--text-pure);
+}
+
+/* --- 8. 1RM CALCULATOR (SECTION 7) ------------------------- */
+.axg-calc-card {
+  background: var(--surface-card);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 24px 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.axg-calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.axg-calc-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.axg-calc-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-pure);
+  font-family: var(--font-brand);
+  font-size: 18px;
+  font-weight: 800;
+  padding: 12px 14px;
+  outline: none;
+  transition: var(--ease);
+}
+
+.axg-calc-input:focus {
+  border-color: var(--border-focus);
+}
+
+.axg-calc-result-box {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.axg-calc-result-box__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.axg-calc-result-box__val {
+  font-family: var(--font-brand);
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--red-hover);
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.axg-calc-disclaimer {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+/* Rep Range Percentages Table */
+.axg-calc-percent-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.axg-calc-percent-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.axg-calc-percent-pct {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.axg-calc-percent-kg {
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+/* --- 9. WORKOUT REWARDS & PROGRESS (SECTIONS 8, 9) --------- */
+.axg-rewards-card {
+  background: var(--surface-card);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 24px 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.axg-badge-showcase {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+@media (min-width: 600px) {
+  .axg-badge-showcase {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.axg-badge-item {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.axg-badge-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.axg-badge-icon.gold {
+  background: var(--gold-dim);
+  border-color: rgba(255, 215, 0, 0.3);
+  color: var(--gold);
+}
+
+.axg-badge-icon.locked {
+  opacity: 0.4;
+  color: var(--text-dim);
+}
+
+.axg-badge-info h4 {
+  font-family: var(--font-brand);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+.axg-badge-info p {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Next Reward Meter */
+.axg-next-reward-box {
+  background: linear-gradient(135deg, rgba(232, 0, 13, 0.08), rgba(24, 24, 24, 0.8));
+  border: 1px solid var(--red-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.axg-next-reward-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.axg-next-reward-header span:first-child {
+  color: var(--red-hover);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.axg-next-reward-header span:last-child {
+  color: var(--text-pure);
+}
+
+/* --- 10. PERFORMANCE & PERSONAL RECORDS (SECTIONS 10, 11) --- */
+.axg-performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+@media (min-width: 600px) {
+  .axg-performance-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.axg-perf-stat-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.axg-perf-stat-card__val {
+  font-family: var(--font-brand);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+.axg-perf-stat-card__val.red {
+  color: var(--red-hover);
+}
+
+.axg-perf-stat-card__lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* PR List */
+.axg-pr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.axg-pr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+
+.axg-pr-exercise {
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.axg-pr-badge {
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--red-hover);
+  background: var(--red-dim);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- 11. TODAY'S RULES (SECTION 12) ------------------------ */
+.axg-rules-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+}
+
+.axg-rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.axg-rules-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.axg-rules-list li i {
+  color: var(--green);
+  font-size: 14px;
+}
+
+/* --- 12. FINISH WORKOUT SECTION (SECTION 13) ---------------- */
+.axg-finish-section {
+  text-align: center;
+  padding: 24px 16px;
+  background: linear-gradient(180deg, var(--surface-card) 0%, rgba(10, 10, 10, 0.95) 100%);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.axg-btn-finish {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  color: var(--text-pure);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 18px 28px;
+  font-family: var(--font-brand);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition: var(--ease);
+}
+
+.axg-btn-finish:hover {
+  background: linear-gradient(135deg, var(--red-hover) 0%, var(--red) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0 36px rgba(232, 0, 13, 0.6);
+}
+
+.axg-btn-finish:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- 13. WORKOUT HISTORY PREVIEW (SECTION 15) -------------- */
+.axg-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.axg-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: var(--ease);
+}
+
+.axg-history-row:hover {
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+}
+
+.axg-history-day-title {
+  font-family: var(--font-brand);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+.axg-history-day-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.axg-history-stats {
+  text-align: right;
+}
+
+.axg-history-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-dim);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* --- 14. MOBILE STICKY BOTTOM BAR (SECTION 16) -------------- */
+.axg-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface-overlay);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border-top: 1px solid var(--border-card);
+  padding: 8px 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+  box-shadow: var(--shadow-sticky);
+}
+
+@media (min-width: 768px) {
+  .axg-bottom-bar {
+    display: none; /* Hidden on desktop */
+  }
+}
+
+.axg-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--ease);
+}
+
+.axg-bottom-nav-item i {
+  font-size: 18px;
+}
+
+.axg-bottom-nav-item:hover,
+.axg-bottom-nav-item.active {
+  color: var(--red-hover);
+}
+
+/* --- 15. MODALS & POPUPS (SECTIONS 13, 14) ------------------ */
+.axg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.axg-modal {
+  background: var(--surface-1);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.axg-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.axg-modal__title {
+  font-family: var(--font-brand);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+.axg-modal__close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.axg-modal__body {
+  padding: 24px;
+}
+
+.axg-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 10, 0.5);
+}
+
+/* Celebration Screen inside Modal */
+.axg-celebration-content {
+  text-align: center;
+}
+
+.axg-trophy-icon {
+  width: 72px;
+  height: 72px;
+  background: var(--gold-dim);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--gold);
+  margin: 0 auto 16px;
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.3);
+}
+
+.axg-celebration-title {
+  font-family: var(--font-brand);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text-pure);
+  margin-bottom: 4px;
+}
+
+.axg-celebration-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.axg-celebration-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.axg-celeb-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+}
+
+.axg-celeb-card__val {
+  font-family: var(--font-brand);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--red-hover);
+}
+
+.axg-celeb-card__lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   DAILY DISCIPLINE AUDIT: ATTENDANCE & WORKOUT (PART 9)
+   ============================================================ */
+.axg-discipline-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-top: 20px;
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+.axg-discipline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.axg-discipline-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffab00;
+  background: rgba(255, 171, 0, 0.12);
+  border: 1px solid rgba(255, 171, 0, 0.25);
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.axg-discipline-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.axg-discipline-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 600px) {
+  .axg-discipline-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.axg-discipline-pill {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.axg-discipline-pill__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.axg-discipline-pill__icon.green {
+  background: rgba(0, 230, 118, 0.15);
+  color: #00e676;
+}
+
+.axg-discipline-pill__icon.yellow {
+  background: rgba(255, 171, 0, 0.15);
+  color: #ffab00;
+}
+
+.axg-discipline-pill__icon.gray {
+  background: rgba(144, 164, 174, 0.15);
+  color: #90a4ae;
+}
+
+.axg-discipline-pill__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.axg-discipline-pill__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.axg-discipline-pill__value {
+  font-family: var(--font-brand);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+
+.axg-discipline-pill__sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.axg-discipline-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--surface-2);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.axg-discipline-footer i {
+  color: #00e5ff;
+}
+

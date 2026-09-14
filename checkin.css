@@ -1,0 +1,583 @@
+/* ============================================================
+   ALPHA X GYM — CLIENT CHECK-IN PAGE STYLES
+   Mobile-First, Responsive & Dark-Mode Optimized
+   ============================================================ */
+
+:root {
+  --bg-primary: #0a0c0f;
+  --bg-surface: #111419;
+  --bg-surface-elevated: #181d24;
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(229, 9, 20, 0.5);
+  --red-primary: #e50914;
+  --red-glow: rgba(229, 9, 20, 0.4);
+  --green-success: #10b981;
+  --yellow-alert: #f59e0b;
+  --text-primary: #ffffff;
+  --text-muted: #94a3b8;
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.12) 0%, transparent 65%),
+    radial-gradient(circle at 10% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+}
+
+.checkin-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Brand Header */
+.checkin-brand {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.checkin-brand-icon {
+  width: 54px;
+  height: 54px;
+  background: linear-gradient(135deg, var(--red-primary), #990000);
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  box-shadow: 0 0 25px var(--red-glow);
+  margin-bottom: 12px;
+}
+
+.checkin-brand-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.checkin-brand-title span {
+  color: var(--red-primary);
+}
+
+.checkin-brand-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* Card Container */
+.checkin-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkin-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--red-primary), transparent);
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Member Profile Pill (When Logged In) */
+.member-profile-pill {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--red-primary);
+  background: #232a35;
+}
+
+.member-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.member-badge {
+  font-size: 11px;
+  color: var(--green-success);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-signout {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-signout:hover {
+  color: var(--red-primary);
+  background: rgba(229, 9, 20, 0.1);
+}
+
+/* Google Sign-in Button */
+.google-signin-btn {
+  width: 100%;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.google-signin-btn:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.demo-login-btn {
+  width: 100%;
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px dashed var(--border-card);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.demo-login-btn:hover {
+  border-color: var(--red-primary);
+  color: var(--red-primary);
+  background: rgba(229, 9, 20, 0.05);
+}
+
+/* Token Status Banner */
+.token-status-banner {
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.token-status-banner.valid {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+.token-status-banner.invalid {
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  color: #fca5a5;
+}
+
+.token-status-icon {
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.token-status-banner.valid .token-status-icon {
+  color: var(--green-success);
+}
+
+.token-status-banner.invalid .token-status-icon {
+  color: var(--red-primary);
+}
+
+/* Alert Notification */
+.checkin-alert {
+  display: none;
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid var(--red-primary);
+  color: #fca5a5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Security Notice */
+.checkin-security-notice {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.checkin-security-notice i {
+  color: var(--red-primary);
+}
+
+/* GPS Geofence Verification Block */
+.gps-verification-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gps-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.gps-card-header i {
+  color: var(--red-primary);
+}
+
+.gps-status-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gps-status-box.verified {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.08);
+  color: #a7f3d0;
+}
+
+.gps-status-box.outside {
+  border-color: rgba(229, 9, 20, 0.4);
+  background: rgba(229, 9, 20, 0.08);
+  color: #fca5a5;
+}
+
+.btn-verify-location {
+  width: 100%;
+  background: linear-gradient(135deg, var(--red-primary), #b91c1c);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-verify-location:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5);
+}
+
+.btn-verify-location:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.gps-radar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(229, 9, 20, 0.2);
+  border-top-color: var(--red-primary);
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.location-accuracy-pill {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ==============================================
+   SECTION 3: ATTENDANCE RESULT & CHALLENGE HANDOFF
+   ============================================== */
+.result-celebration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  animation: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.result-party-icon {
+  font-size: 48px;
+  margin-bottom: -4px;
+}
+
+.result-title {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.result-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.result-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.result-status-badge.status-present {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--green-success);
+  color: var(--green-success);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.result-time {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.result-meta-list {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 12px 18px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.result-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Challenge Handoff Box */
+.challenge-handoff-box {
+  background: linear-gradient(180deg, rgba(229, 9, 20, 0.08) 0%, rgba(24, 29, 36, 0.8) 100%);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 20px;
+  padding: 22px;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.challenge-handoff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.challenge-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red-primary);
+}
+
+.challenge-days-count {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.challenge-workout-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.status-comparison-row {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 8px 0;
+}
+
+.status-comparison-pill {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pill-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.pill-value {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-green { color: var(--green-success); }
+.text-yellow { color: var(--yellow-alert); }
+
+.btn-start-workout {
+  background: linear-gradient(135deg, var(--red-primary), #b91c1c);
+  color: white;
+  text-decoration: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-start-workout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(229, 9, 20, 0.6);
+  color: white;
+}
+
+

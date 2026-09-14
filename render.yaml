@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: alphaxgym-platform
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: alphaxgym-database
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BASE_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GYM_DEFAULT_LAT
+        value: "12.9716"
+      - key: GYM_DEFAULT_LNG
+        value: "77.5946"
+      - key: GYM_ALLOWED_RADIUS
+        value: "75.0"
+
+databases:
+  - name: alphaxgym-database
+    plan: starter
+    databaseName: alphaxgym
+    user: alphaxadmin
+    postgresMajorVersion: "16"

@@ -1,0 +1,325 @@
+// ============================================================
+// ALPHA X GYM — PRISMA ORM SCHEMA (POSTGRESQL ONLY)
+// 100-Day Transformation Challenge & Workout Tracking System
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// 1. ADMIN
+// Gym coaches and administrators who manage challenges & workouts
+// ------------------------------------------------------------
+model Admin {
+  id         String      @id @default(uuid())
+  name       String
+  email      String      @unique
+  password   String      // Bcrypt password hash - NEVER plain text
+  role       String      @default("admin")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  challenges Challenge[]
+
+  @@map("admins")
+}
+
+// ------------------------------------------------------------
+// 2. CLIENT
+// Athletes participating in 100-Day challenges
+// ------------------------------------------------------------
+model Client {
+  id                    String                 @id @default(uuid())
+  googleId              String?                @unique
+  name                  String
+  phone                 String?                @unique
+  email                 String?
+  avatarUrl             String?
+  startingWeight        Float?
+  currentWeight         Float?
+  endingWeight          Float?
+  status                String                 @default("active") // "active", "completed", "dropped"
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  challengeParticipants ChallengeParticipant[]
+  weightLogs            WeightLog[]
+  attendances           GymAttendance[]
+
+  @@map("clients")
+}
+
+// ------------------------------------------------------------
+// 3. CHALLENGE
+// Transformation challenges (e.g. 100-Day Challenge)
+// ------------------------------------------------------------
+model Challenge {
+  id            String                 @id @default(uuid())
+  name          String
+  description   String?
+  imageUrl      String?                @default("images/gym-hero.jpg")
+  startDate     DateTime
+  endDate       DateTime
+  totalDays     Int                    @default(100)
+  status        String                 @default("active") // "active", "draft", "completed", "archived"
+  visibility    String                 @default("public") // "public", "unlisted", "private"
+  rules         String?
+  rewardSummary String?
+  adminId       String?
+  admin         Admin?                 @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  participants  ChallengeParticipant[]
+  workoutDays   WorkoutDay[]
+  rewards       Reward[]
+
+  @@map("challenges")
+}
+
+// ------------------------------------------------------------
+// 4. CHALLENGE PARTICIPANT
+// Junction model connecting Clients to Challenges
+// ------------------------------------------------------------
+model ChallengeParticipant {
+  id           String              @id @default(uuid())
+  clientId     String
+  challengeId  String
+  client       Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  challenge    Challenge           @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  joinedAt     DateTime            @default(now())
+  status       String              @default("active") // "active", "completed", "dropped"
+  completions  WorkoutCompletion[]
+  rewardClaims RewardClaim[]
+
+  @@unique([clientId, challengeId], name: "uq_client_challenge")
+  @@index([clientId])
+  @@index([challengeId])
+  @@map("challenge_participants")
+}
+
+// ------------------------------------------------------------
+// 5. WORKOUT DAY
+// Day-by-day workout prescription (Day 1..100)
+// ------------------------------------------------------------
+model WorkoutDay {
+  id          String              @id @default(uuid())
+  challengeId String
+  challenge   Challenge           @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  dayNumber   Int
+  date        DateTime?
+  title       String
+  description String?
+  reward      String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  exercises   Exercise[]
+  completions WorkoutCompletion[]
+
+  @@unique([challengeId, dayNumber], name: "uq_challenge_day")
+  @@index([challengeId])
+  @@index([dayNumber])
+  @@map("workout_days")
+}
+
+// ------------------------------------------------------------
+// 6. EXERCISE
+// Assigned exercises per workout day (prescribed by admin)
+// ------------------------------------------------------------
+model Exercise {
+  id           String        @id @default(uuid())
+  workoutDayId String
+  workoutDay   WorkoutDay    @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  sets         Int           @default(3)
+  reps         String        @default("10")
+  restSeconds  Int           @default(60)
+  order        Int           @default(1)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  exerciseLogs ExerciseLog[]
+
+  @@index([workoutDayId])
+  @@index([order])
+  @@map("exercises")
+}
+
+// ------------------------------------------------------------
+// 7. WORKOUT COMPLETION
+// Records when an athlete completes a workout day
+// ------------------------------------------------------------
+model WorkoutCompletion {
+  id              String               @id @default(uuid())
+  participantId   String
+  participant     ChallengeParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  workoutDayId    String
+  workoutDay      WorkoutDay           @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  startedAt       DateTime             @default(now())
+  completedAt     DateTime?
+  durationSeconds Int?
+  status          String               @default("completed") // "in_progress", "completed"
+  createdAt       DateTime             @default(now())
+  exerciseLogs    ExerciseLog[]
+
+  @@unique([participantId, workoutDayId], name: "uq_participant_day_completion")
+  @@index([participantId])
+  @@index([workoutDayId])
+  @@index([status])
+  @@map("workout_completions")
+}
+
+// ------------------------------------------------------------
+// 8. EXERCISE LOG
+// Actual sets, reps, and kg lifted by athlete
+// ------------------------------------------------------------
+model ExerciseLog {
+  id            String            @id @default(uuid())
+  completionId  String
+  completion    WorkoutCompletion @relation(fields: [completionId], references: [id], onDelete: Cascade)
+  exerciseId    String
+  exercise      Exercise          @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  setNumber     Int
+  repsCompleted Int
+  weightUsed    Float
+  createdAt     DateTime          @default(now())
+
+  @@index([completionId])
+  @@index([exerciseId])
+  @@map("exercise_logs")
+}
+
+// ------------------------------------------------------------
+// 9. WEIGHT LOG
+// Periodic athlete body-weight tracking
+// ------------------------------------------------------------
+model WeightLog {
+  id        String   @id @default(uuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  weight    Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+  @@index([date])
+  @@map("weight_logs")
+}
+
+// ------------------------------------------------------------
+// 10. REWARD
+// Milestone rewards configured by admin
+// ------------------------------------------------------------
+model Reward {
+  id          String        @id @default(uuid())
+  challengeId String
+  challenge   Challenge     @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  points      Int           @default(10)
+  dayNumber   Int?
+  createdAt   DateTime      @default(now())
+  claims      RewardClaim[]
+
+  @@index([challengeId])
+  @@map("rewards")
+}
+
+// ------------------------------------------------------------
+// 11. REWARD CLAIM
+// Records rewards unlocked or claimed by athletes
+// ------------------------------------------------------------
+model RewardClaim {
+  id            String               @id @default(uuid())
+  participantId String
+  participant   ChallengeParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  rewardId      String
+  reward        Reward               @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  claimedAt     DateTime             @default(now())
+  status        String               @default("unlocked") // "unlocked", "claimed"
+
+  @@unique([participantId, rewardId], name: "uq_participant_reward")
+  @@index([participantId])
+  @@index([rewardId])
+  @@map("reward_claims")
+}
+
+// ------------------------------------------------------------
+// 12. GYM
+// Physical gym location, geofence parameters, and operating hours
+// ------------------------------------------------------------
+model Gym {
+  id                  String          @id @default(uuid())
+  name                String          @default("Alpha X Gym")
+  latitude            Float           @default(12.9716)
+  longitude           Float           @default(77.5946)
+  allowedRadiusMeters Float           @default(75.0) // 50m, 75m, 100m, 150m
+  openTime            String          @default("05:00") // 05:00 AM
+  closeTime           String          @default("22:00") // 10:00 PM
+  qrRefreshSeconds    Int             @default(30)      // 30–60 seconds
+  timezone            String          @default("Asia/Kolkata")
+  isActive            Boolean         @default(true)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  qrTokens            GymQrToken[]
+  attendances         GymAttendance[]
+
+  @@map("gyms")
+}
+
+// ------------------------------------------------------------
+// 13. GYM QR TOKEN
+// Short-lived signed check-in tokens displayed on gym screen
+// ------------------------------------------------------------
+model GymQrToken {
+  id          String          @id @default(uuid())
+  tokenHash   String          @unique // Cryptographic hash / secure identifier
+  token       String?         // Plain short-lived token or payload identifier
+  gymId       String
+  gym         Gym             @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime        // Short-lived TTL (e.g. 30-60 seconds)
+  isUsed      Boolean         @default(false)
+  usedAt      DateTime?
+  createdAt   DateTime        @default(now())
+  attendances GymAttendance[]
+
+  @@index([gymId])
+  @@index([expiresAt])
+  @@map("gym_qr_tokens")
+}
+
+// ------------------------------------------------------------
+// 14. GYM ATTENDANCE
+// Secure daily attendance record with GPS geofence audit
+// ------------------------------------------------------------
+model GymAttendance {
+  id                 String      @id @default(uuid())
+  clientId           String
+  client             Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  gymId              String
+  gym                Gym         @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  attendanceDate     String      // Format: YYYY-MM-DD in gym timezone (Asia/Kolkata)
+  checkInAt          DateTime?   // Timestamp of check-in, or null if marked absent
+  status             String      @default("present") // "present", "absent"
+  latitude           Float?      // Client device GPS latitude
+  longitude          Float?      // Client device GPS longitude
+  gpsAccuracy        Float?      // Client device GPS accuracy in meters
+  distanceMeters     Float?      // Calculated distance to gym coordinates
+  locationVerified   Boolean     @default(false)
+  qrTokenId          String?
+  qrToken            GymQrToken? @relation(fields: [qrTokenId], references: [id], onDelete: SetNull)
+  verificationMethod String      @default("dynamic_qr_gps") // "dynamic_qr_gps", "auto_absent", "manual_admin"
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@unique([clientId, attendanceDate], name: "uq_client_daily_attendance")
+  @@index([clientId])
+  @@index([gymId])
+  @@index([attendanceDate])
+  @@index([status])
+  @@map("gym_attendances")
+}

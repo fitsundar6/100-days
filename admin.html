@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpha X Gym — 100-Day Transformation Management System</title>
+
+  <!-- Google Fonts: Poppins (Brand & Headings) & Inter (UI & Data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Pro / Free CDN for Vector Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Chart.js (for weight progress graph) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-style.css" />
+</head>
+<body class="axg-body">
+
+  <!-- ================================================
+       APP SHELL WRAPPER
+  ================================================ -->
+  <div class="axg-app-layout">
+
+    <!-- ==============================================
+         LEFT NAVIGATION SIDEBAR (DARK GYM TEXTURE)
+    ============================================== -->
+    <aside class="axg-sidebar" id="axgSidebar">
+      <!-- Gym Brand Header -->
+      <div class="axg-sidebar__brand">
+        <div class="axg-brand-badge">
+          <i class="fa-solid fa-bolt-lightning axg-brand-icon"></i>
+        </div>
+        <div class="axg-brand-info">
+          <span class="axg-brand-title">ALPHA X <span class="axg-brand-accent">GYM</span></span>
+          <span class="axg-brand-tagline">100-DAY TRANSFORMATION</span>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="axg-sidebar__nav">
+        <div class="axg-nav-section-title">NAVIGATION</div>
+        <a href="#dashboard" class="axg-nav-link axg-nav-link--active" id="navDashboard">
+          <i class="fa-solid fa-chart-pie axg-nav-icon"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#challenge" class="axg-nav-link" id="navChallenge">
+          <i class="fa-solid fa-calendar-check axg-nav-icon"></i>
+          <span>100-Day Challenge</span>
+        </a>
+        <a href="#clientsSection" class="axg-nav-link" id="navClients" title="Touch to see all client data">
+          <i class="fa-solid fa-users axg-nav-icon"></i>
+          <span>Clients</span>
+        </a>
+        <a href="#weight" class="axg-nav-link" id="navWeight">
+          <i class="fa-solid fa-weight-scale axg-nav-icon"></i>
+          <span>Weight Tracking</span>
+        </a>
+        <a href="#challengeManagementSection" class="axg-nav-link" id="navChallengeAdmin">
+          <i class="fa-solid fa-trophy axg-nav-icon"></i>
+          <span>Public Challenges</span>
+        </a>
+        <a href="#attendanceSection" class="axg-nav-link" id="navAttendance">
+          <i class="fa-solid fa-clipboard-user axg-nav-icon"></i>
+          <span>Gym Attendance</span>
+        </a>
+        <a href="#settings" class="axg-nav-link" id="navSettings">
+          <i class="fa-solid fa-sliders axg-nav-icon"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Coach / Admin Profile Pill -->
+      <div class="axg-sidebar__profile">
+        <div class="axg-avatar">
+          <span>AX</span>
+        </div>
+        <div class="axg-profile-details">
+          <span class="axg-profile-name">Head Coach</span>
+          <span class="axg-profile-status"><span class="axg-status-dot"></span> System Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==============================================
+         MAIN APPLICATION AREA
+    ============================================== -->
+    <div class="axg-main-wrapper">
+
+      <!-- TOP APPLICATION HEADER BAR -->
+      <header class="axg-header axg-topbar">
+        <div class="axg-topbar__left">
+          <button type="button" class="axg-sidebar-toggle" id="sidebarToggle" aria-label="Toggle Navigation Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="axg-topbar__title-group">
+            <h1 class="axg-topbar__title">Alpha X Gym Dashboard</h1>
+            <span class="axg-topbar__subtitle">100-Day Challenge Management System</span>
+          </div>
+        </div>
+
+        <div class="axg-topbar__right">
+          <button type="button" class="axg-btn axg-btn--ghost" id="viewAllClientsBtn" title="Touch to see all client data">
+            <i class="fa-solid fa-users"></i>
+            <span>All Clients</span>
+          </button>
+          <button type="button" class="axg-btn axg-btn--primary" id="openAddClientModal">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Client</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT VIEW -->
+      <main class="axg-main">
+
+        <!-- ==============================================
+             HERO / DASHBOARD HEADER WITH CINEMATIC VISUAL
+        ============================================== -->
+        <section class="axg-hero-banner" aria-label="Dashboard Hero Overview">
+          <div class="axg-hero-banner__overlay"></div>
+          <div class="axg-hero-banner__content">
+            <div class="axg-hero-badge">
+              <i class="fa-solid fa-shield-halved axg-hero-badge__icon"></i>
+              <span>ALPHA X GYM • 100-DAY TRANSFORMATION PROTOCOL</span>
+            </div>
+            <h1 class="axg-hero-title">
+              TRANSFORMATION <span class="axg-hero-accent">PERFORMANCE</span> HUB
+            </h1>
+            <p class="axg-hero-description">
+              Commercial-grade body composition tracking, daily gym discipline accountability, and weight trajectory analytics for Alpha X Gym athletes.
+            </p>
+            <div class="axg-hero-meta">
+              <div class="axg-hero-meta-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span>Active Cycle: <strong>Season 2026</strong></span>
+              </div>
+              <div class="axg-hero-meta-divider"></div>
+              <div class="axg-hero-meta-item">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>Protocol: <strong>100 Consecutive Days</strong></span>
+              </div>
+              <div class="axg-hero-meta-divider"></div>
+              <div class="axg-hero-meta-item">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>WhatsApp Reports: <strong>Automated 1-Click</strong></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -----------------------------------------------
+             SUMMARY STATS BAR (4 CARDS)
+        ----------------------------------------------- -->
+        <section class="axg-stats-bar" aria-label="Key Performance Indicators">
+
+          <!-- Total Clients -->
+          <div class="axg-stat-card axg-stat-card--clickable" id="statTotalClientsCard" title="Touch to see all client data" role="button" tabindex="0">
+            <div class="axg-stat-card__icon-wrap axg-stat-card__icon-wrap--clients">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="axg-stat-card__content">
+              <span class="axg-stat-card__label">Total Enrolled</span>
+              <span class="axg-stat-card__value" id="statTotalClients">0</span>
+            </div>
+          </div>
+
+          <!-- Active Challenges -->
+          <div class="axg-stat-card">
+            <div class="axg-stat-card__icon-wrap axg-stat-card__icon-wrap--active">
+              <i class="fa-solid fa-fire"></i>
+            </div>
+            <div class="axg-stat-card__content">
+              <span class="axg-stat-card__label">Active Challenges</span>
+              <span class="axg-stat-card__value axg-stat-card__value--active" id="statActiveClients">0</span>
+            </div>
+          </div>
+
+          <!-- Completed -->
+          <div class="axg-stat-card">
+            <div class="axg-stat-card__icon-wrap axg-stat-card__icon-wrap--completed">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div class="axg-stat-card__content">
+              <span class="axg-stat-card__label">Completed (100 Days)</span>
+              <span class="axg-stat-card__value axg-stat-card__value--completed" id="statCompletedClients">0</span>
+            </div>
+          </div>
+
+          <!-- Avg. Weight Change -->
+          <div class="axg-stat-card">
+            <div class="axg-stat-card__icon-wrap axg-stat-card__icon-wrap--change">
+              <i class="fa-solid fa-arrow-trend-down"></i>
+            </div>
+            <div class="axg-stat-card__content">
+              <span class="axg-stat-card__label">Avg. Weight Change</span>
+              <span class="axg-stat-card__value axg-stat-card__value--change" id="statAvgChange">— kg</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- -----------------------------------------------
+             SEARCH + FILTER TOOLBAR
+        ----------------------------------------------- -->
+        <section class="axg-toolbar" aria-label="Search and Filter Controls">
+
+          <div class="axg-search-wrap">
+            <i class="fa-solid fa-magnifying-glass axg-search-icon"></i>
+            <input
+              type="text"
+              id="searchInput"
+              class="axg-search-input"
+              placeholder="Search by client name or phone number..."
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="axg-filter-tabs" role="tablist">
+            <button type="button" class="axg-filter-tab axg-filter-tab--active" data-filter="all" role="tab" aria-selected="true">
+              All Clients
+            </button>
+            <button type="button" class="axg-filter-tab" data-filter="active" role="tab" aria-selected="false">
+              Active
+            </button>
+            <button type="button" class="axg-filter-tab" data-filter="upcoming" role="tab" aria-selected="false">
+              Upcoming
+            </button>
+            <button type="button" class="axg-filter-tab" data-filter="completed" role="tab" aria-selected="false">
+              Completed
+            </button>
+          </div>
+
+        </section>
+
+        <!-- -----------------------------------------------
+             CLIENT ROSTER TABLE SECTION
+        ----------------------------------------------- -->
+        <section class="axg-table-section" id="clientsSection">
+
+          <!-- Empty State (shown when zero clients exist) -->
+          <div class="axg-empty-state" id="emptyState">
+            <div class="axg-empty-state__icon-box">
+              <i class="fa-solid fa-dumbbell axg-empty-state__icon"></i>
+            </div>
+            <h2 class="axg-empty-state__heading">No Transformation Clients Yet</h2>
+            <p class="axg-empty-state__text">
+              Begin your gym's transformation tracking by registering your first member into the 100-Day Challenge.
+            </p>
+            <button type="button" class="axg-btn axg-btn--primary" onclick="document.getElementById('openAddClientModal').click()">
+              <i class="fa-solid fa-plus"></i> + Add First Client
+            </button>
+          </div>
+
+          <!-- The client table (hidden until at least one client exists) -->
+          <div class="axg-table-wrap" id="clientTableWrap" style="display:none;">
+            <table class="axg-table" id="clientTable">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>WhatsApp</th>
+                  <th>Start Weight</th>
+                  <th>Current Weight</th>
+                  <th>Change</th>
+                  <th>Day</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clientTableBody">
+                <!-- Dynamically populated by admin-app.js -->
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- ==============================================
+             CHALLENGES MANAGEMENT SECTION (PUBLIC CHALLENGES)
+        ============================================== -->
+        <section class="axg-challenges-section" id="challengeManagementSection">
+
+          <!-- Section Top Header -->
+          <div class="axg-section-header">
+            <div class="axg-section-header__title-group">
+              <div class="axg-badge-label"><i class="fa-solid fa-crown"></i> ADMIN CONTROLS EVERYTHING</div>
+              <h2 class="axg-section-heading">Public Challenge Management <span style="color:var(--text-dim); font-weight:400;">&rarr;</span> <span style="color:var(--red);">My Challenges</span></h2>
+              <p class="axg-section-sub">
+                Admin controls the entire challenge architecture: create challenges, configure Day 1–100 workouts, manage exercise library, and monitor athlete completions in real time.
+              </p>
+            </div>
+            <div class="axg-section-header__actions">
+              <button type="button" class="axg-btn axg-btn--primary" id="openCreateChallengeModal">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Challenge</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Public Challenges KPI Metrics Strip -->
+          <div class="axg-challenge-kpi-bar">
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value" id="kpiTotalChallenges">1</span>
+                <span class="axg-challenge-kpi-label">Total Challenges</span>
+              </div>
+            </div>
+
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box accent">
+                <i class="fa-solid fa-fire"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value accent" id="kpiActiveChallenges">1 Active</span>
+                <span class="axg-challenge-kpi-label">Status</span>
+              </div>
+            </div>
+
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box blue">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value" id="kpiTotalParticipants">48</span>
+                <span class="axg-challenge-kpi-label">Enrolled Athletes</span>
+              </div>
+            </div>
+
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box green">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value green" id="kpiCompletedToday">16</span>
+                <span class="axg-challenge-kpi-label">Workouts Today</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- My Challenges Sub-Header -->
+          <div class="axg-my-challenges-header" style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="axg-badge axg-badge--active" style="font-size: 10px; padding: 2px 8px;">DIRECTORY</span>
+              <h3 style="font-family: var(--font-brand); font-size: 20px; font-weight: 800; color: var(--text-pure); letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; margin: 0;">
+                <i class="fa-solid fa-layer-group" style="color: var(--red);"></i> MY CHALLENGES
+              </h3>
+            </div>
+            <span class="axg-challenges-count-badge" id="myChallengesCountBadge" style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--surface-2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-card);">
+              Active Challenge Directory
+            </span>
+          </div>
+
+          <!-- Toolbar: Search & Status Filter Tabs -->
+          <div class="axg-challenge-toolbar">
+            <div class="axg-challenge-search-wrap">
+              <i class="fa-solid fa-magnifying-glass axg-challenge-search-icon"></i>
+              <input
+                type="text"
+                id="challengeSearchInput"
+                class="axg-challenge-search-input"
+                placeholder="Search challenges by name or keyword..."
+                aria-label="Search challenges"
+              />
+            </div>
+
+            <div class="axg-challenge-filter-tabs" id="challengeFilterTabs">
+              <button type="button" class="axg-challenge-filter-btn axg-challenge-filter-btn--active" data-filter="all">
+                All Challenges
+              </button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="active">
+                Active
+              </button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="draft">
+                Draft
+              </button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="completed">
+                Completed
+              </button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="archived">
+                Archived
+              </button>
+            </div>
+          </div>
+
+          <!-- Challenge Cards Grid -->
+          <div class="axg-challenges-grid" id="adminChallengesGrid">
+            <!-- Dynamically populated by admin-challenges.js -->
+          </div>
+        </section>
+
+        <!-- ==============================================
+             SECURE GYM ATTENDANCE SYSTEM SECTION (PART 8)
+        ============================================== -->
+        <section class="axg-section axg-attendance-section" id="attendanceSection" aria-label="Gym Attendance Management" style="margin-top: 40px;">
+
+          <!-- Attendance Header -->
+          <div class="axg-section-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span class="axg-badge axg-badge--active" style="font-size: 10px; padding: 2px 8px; background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);">
+                  <i class="fa-solid fa-shield-halved"></i> ANTI-CHEAT SECURED
+                </span>
+                <span class="axg-badge" style="font-size: 10px; padding: 2px 8px; background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid rgba(255, 171, 0, 0.3);">
+                  <i class="fa-solid fa-satellite-dish"></i> 75M GEOFENCE
+                </span>
+              </div>
+              <h2 class="axg-section-title">
+                <i class="fa-solid fa-clipboard-user" style="color: var(--red);"></i> SECURE GYM ATTENDANCE SYSTEM
+              </h2>
+              <p class="axg-section-subtitle">
+                Dynamic 30s signed QR tokens, server-verified GPS geofence, and automated end-of-day absent system synced with 100-Day workout protocols.
+              </p>
+            </div>
+            <div class="axg-section-header__actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="/admin/gym-qr" target="_blank" class="axg-btn axg-btn--primary" id="btnOpenQrDisplay">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>Launch Gym QR Display</span>
+              </a>
+              <button type="button" class="axg-btn axg-btn--ghost" id="btnTriggerAbsentJob" title="Manually execute end-of-day absent calculation">
+                <i class="fa-solid fa-moon"></i>
+                <span>Run Absent Job</span>
+              </button>
+              <button type="button" class="axg-btn axg-btn--ghost" id="btnRefreshAttendance" title="Refresh Live Attendance Data">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5 Live Attendance KPI Cards -->
+          <div class="axg-challenge-kpi-bar" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+            <!-- 1. Total Active Clients -->
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box blue">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value" id="attKpiTotalActive">0</span>
+                <span class="axg-challenge-kpi-label">Active Members</span>
+              </div>
+            </div>
+
+            <!-- 2. Present Today -->
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box green">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value green" id="attKpiPresent">0</span>
+                <span class="axg-challenge-kpi-label">Present Today</span>
+              </div>
+            </div>
+
+            <!-- 3. Absent Today -->
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box accent">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value accent" id="attKpiAbsent">0</span>
+                <span class="axg-challenge-kpi-label">Absent Today</span>
+              </div>
+            </div>
+
+            <!-- 4. Attendance % Today -->
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box" style="background: rgba(255, 171, 0, 0.12); color: #ffab00;">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value" style="color: #ffab00;" id="attKpiRate">0%</span>
+                <span class="axg-challenge-kpi-label">Attendance Rate</span>
+              </div>
+            </div>
+
+            <!-- 5. Currently in Gym -->
+            <div class="axg-challenge-kpi-card">
+              <div class="axg-challenge-kpi-icon-box" style="background: rgba(0, 229, 255, 0.12); color: #00e5ff;">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              <div class="axg-challenge-kpi-info">
+                <span class="axg-challenge-kpi-value" style="color: #00e5ff;" id="attKpiCurrentlyInGym">0</span>
+                <span class="axg-challenge-kpi-label">Currently in Gym</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Dynamic Attendance QR Terminal Card -->
+          <div class="axg-admin-qr-banner" id="adminQrBanner" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: linear-gradient(135deg, rgba(229, 9, 20, 0.08) 0%, rgba(20, 24, 30, 0.95) 100%); border: 1px solid rgba(229, 9, 20, 0.35); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <!-- High-contrast QR Display Box -->
+              <div style="position: relative; width: 140px; height: 140px; background: #fff; border-radius: 14px; padding: 6px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); flex-shrink: 0;">
+                <img id="adminQrImage" alt="Alpha X Gym Live Attendance QR" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px; display: block;" src="" />
+                <div id="adminQrLoadingOverlay" style="position: absolute; inset: 0; background: rgba(17, 20, 25, 0.92); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+                  <i class="fa-solid fa-spinner fa-spin" style="color: var(--red); font-size: 20px;"></i>
+                  <span style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Generating QR...</span>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span class="axg-badge" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); font-size: 11px; padding: 2px 8px;">
+                    <i class="fa-solid fa-signal"></i> LIVE DYNAMIC QR
+                  </span>
+                  <span style="font-size: 11px; color: var(--text-dim);" id="adminQrFacility">Alpha X Gym — Main Facility</span>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-pure); margin-bottom: 4px; font-family: var(--font-heading);">
+                  Today's Active Check-in QR
+                </h3>
+                <p style="font-size: 12px; color: var(--text-muted); max-width: 460px; line-height: 1.5; margin-bottom: 12px;">
+                  Members scan this rotating dynamic QR with their phone camera to mark attendance inside the gym. Code automatically rotates with a short-lived HMAC signature.
+                </p>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--red);">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>Refreshes in: <span id="adminQrCountdown" style="color: #fff;">30s</span></span>
+                  </div>
+                  <div style="width: 120px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div id="adminQrProgressFill" style="height: 100%; width: 100%; background: var(--red); transition: width 1s linear;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+              <a href="/admin/gym-qr" target="_blank" class="axg-btn axg-btn--primary" id="adminQrLaunchFullscreenBtn" style="padding: 10px 18px; font-size: 13px;">
+                <i class="fa-solid fa-expand"></i>
+                <span>Open Fullscreen TV/Kiosk</span>
+              </a>
+              <button type="button" class="axg-btn axg-btn--ghost" id="adminQrManualRefreshBtn" style="padding: 6px 14px; font-size: 11px;">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Refresh QR Token</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Attendance Toolbar: Date Selector, Filters, Search -->
+          <div class="axg-attendance-toolbar" style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; background: var(--surface-1); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-card);">
+            <!-- Date Filter Group -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Date:</span>
+              <input type="date" id="attDateFilter" class="axg-input" style="padding: 6px 12px; font-size: 13px; width: auto; background: var(--surface-2); border-color: var(--border-card);" />
+              <button type="button" class="axg-btn axg-btn--ghost" id="attDateTodayBtn" style="padding: 6px 12px; font-size: 12px;">
+                Today
+              </button>
+            </div>
+
+            <!-- Status Filter Tabs -->
+            <div class="axg-challenge-filter-tabs" id="attFilterTabs" style="margin: 0;">
+              <button type="button" class="axg-challenge-filter-btn axg-challenge-filter-btn--active" data-filter="all">All</button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="present">Present Only</button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="absent">Absent Only</button>
+              <button type="button" class="axg-challenge-filter-btn" data-filter="incomplete-workout">Incomplete Workout</button>
+            </div>
+
+            <!-- Search input -->
+            <div class="axg-challenge-search-wrap" style="min-width: 220px; margin: 0;">
+              <i class="fa-solid fa-magnifying-glass axg-challenge-search-icon"></i>
+              <input type="text" id="attSearchInput" class="axg-challenge-search-input" placeholder="Search athlete by name..." style="padding-top: 8px; padding-bottom: 8px; font-size: 13px;" />
+            </div>
+          </div>
+
+          <!-- Live Attendance Table -->
+          <div class="axg-card" style="padding: 0; overflow: hidden; margin-bottom: 28px;">
+            <div class="axg-table-wrapper" style="margin: 0; max-height: 520px; overflow-y: auto;">
+              <table class="axg-table" id="attendanceTable">
+                <thead>
+                  <tr>
+                    <th>ATHLETE</th>
+                    <th>CHECK-IN TIME</th>
+                    <th>ATTENDANCE STATUS</th>
+                    <th>LOCATION GEOFENCE</th>
+                    <th>WORKOUT PROTOCOL</th>
+                    <th>WORKOUT STARTED</th>
+                    <th>WORKOUT DONE</th>
+                    <th>METHOD</th>
+                    <th style="text-align: right;">OVERRIDE</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      <i class="fa-solid fa-spinner fa-spin" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>
+                      Loading live attendance roster...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Gym Attendance Settings Card -->
+          <div class="axg-card axg-attendance-settings-card" style="background: var(--surface-1); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h3 style="font-family: var(--font-brand); font-size: 18px; font-weight: 800; color: var(--text-pure); margin: 0; display: flex; align-items: center; gap: 10px;">
+                  <i class="fa-solid fa-sliders" style="color: var(--gold);"></i> GYM ATTENDANCE & GEOFENCE SETTINGS
+                </h3>
+                <p style="font-size: 13px; color: var(--text-dim); margin: 4px 0 0 0;">
+                  Configure facility GPS center point, allowable physical proximity radius, operating windows, and QR token lifespan.
+                </p>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <a href="/admin/gym-qr" target="_blank" class="axg-btn axg-btn--ghost">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live QR Kiosk
+                </a>
+              </div>
+            </div>
+
+            <form id="attendanceSettingsForm">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 18px;">
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingGymName">Facility Name</label>
+                  <input type="text" id="settingGymName" class="axg-input" value="Alpha X Gym — Main Facility" required />
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingLatitude">Facility Latitude</label>
+                  <input type="number" step="0.000001" id="settingLatitude" class="axg-input" value="12.9716" required />
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingLongitude">Facility Longitude</label>
+                  <input type="number" step="0.000001" id="settingLongitude" class="axg-input" value="77.5946" required />
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingAllowedRadius">Allowed Geofence Radius</label>
+                  <select id="settingAllowedRadius" class="axg-input">
+                    <option value="50">50 Meters (Strict Indoor)</option>
+                    <option value="75" selected>75 Meters (Standard Facility)</option>
+                    <option value="100">100 Meters (Large Campus)</option>
+                    <option value="150">150 Meters (High Tolerance)</option>
+                  </select>
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingOpenTime">Gym Opening Time</label>
+                  <input type="time" id="settingOpenTime" class="axg-input" value="05:00" required />
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingCloseTime">Gym Closing Time</label>
+                  <input type="time" id="settingCloseTime" class="axg-input" value="22:00" required />
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label" for="settingQrRefresh">QR Refresh Interval</label>
+                  <select id="settingQrRefresh" class="axg-input">
+                    <option value="30" selected>30 Seconds (Maximum Security)</option>
+                    <option value="60">60 Seconds (Standard Dynamic)</option>
+                  </select>
+                </div>
+                <div class="axg-form-group">
+                  <label class="axg-label">Timezone</label>
+                  <input type="text" class="axg-input" value="Asia/Kolkata" disabled style="opacity: 0.7; cursor: not-allowed;" />
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="submit" class="axg-btn axg-btn--primary" id="btnSaveAttendanceSettings">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Facility Settings
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 1: ADD NEW CLIENT
+  ================================================ -->
+  <div class="axg-modal-overlay" id="addClientModal" style="display:none;">
+    <div class="axg-modal">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-user-plus axg-modal__header-icon"></i>
+          <div>
+            <h2 class="axg-modal__title">New 100-Day Challenge</h2>
+            <p class="axg-modal__subtitle">Register a member and initialize day calculation</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeAddClientModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="addClientForm" class="axg-modal__form">
+        <div class="axg-modal__body">
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputClientName">
+              <i class="fa-solid fa-user"></i> Client Full Name
+            </label>
+            <input
+              type="text"
+              id="inputClientName"
+              class="axg-input"
+              placeholder="e.g. Rahul Sharma"
+              required
+            />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputClientPhone">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp Phone Number (with country code)
+            </label>
+            <input
+              type="tel"
+              id="inputClientPhone"
+              class="axg-input"
+              placeholder="e.g. 919876543210"
+            />
+            <span class="axg-input-hint">Used for 1-click WhatsApp progress reports</span>
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputStartWeight">
+              <i class="fa-solid fa-weight-scale"></i> Starting Weight (kg)
+            </label>
+            <input
+              type="number"
+              id="inputStartWeight"
+              class="axg-input"
+              placeholder="e.g. 84.5"
+              step="0.1"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputStartDate">
+              <i class="fa-solid fa-calendar-days"></i> Challenge Start Date
+            </label>
+            <input
+              type="date"
+              id="inputStartDate"
+              class="axg-input"
+              required
+            />
+          </div>
+
+          <div class="axg-form-preview" id="datePreview" style="display:none;">
+            <i class="fa-solid fa-flag-checkered axg-preview-icon"></i>
+            <div>
+              <span class="axg-form-preview__label">Challenge End Date (Day 100):</span>
+              <strong class="axg-form-preview__value" id="previewEndDate">—</strong>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="axg-modal__footer">
+          <button type="button" class="axg-btn axg-btn--ghost" id="cancelAddClient">Cancel</button>
+          <button type="submit" class="axg-btn axg-btn--primary" id="confirmAddClient">
+            <i class="fa-solid fa-check"></i> Create Challenge
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 2: CLIENT DETAILS & 100-DAY TRACKER
+  ================================================ -->
+  <div class="axg-modal-overlay" id="clientDetailModal" style="display:none;">
+    <div class="axg-modal axg-modal--wide">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__header-client">
+          <div class="axg-client-avatar-badge">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+          <div>
+            <h2 class="axg-modal__title" id="detailClientName">Client Name</h2>
+            <span class="axg-detail-phone" id="detailClientPhone">
+              <i class="fa-brands fa-whatsapp"></i> No phone added
+            </span>
+          </div>
+        </div>
+        <div class="axg-modal__header-controls">
+          <div class="axg-client-switcher" id="clientSwitcherWrap" style="display:none;">
+            <label for="clientSelectDropdown" class="axg-client-switcher__label"><i class="fa-solid fa-users"></i> Switch Client:</label>
+            <select id="clientSelectDropdown" class="axg-client-switcher__select" aria-label="Switch client"></select>
+          </div>
+          <button type="button" class="axg-modal__close" id="closeClientDetailModal" aria-label="Close dialog">&times;</button>
+        </div>
+      </div>
+
+      <div class="axg-modal__body">
+
+        <!-- Challenge Timeline Summary -->
+        <div class="axg-detail-summary">
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label"><i class="fa-regular fa-calendar"></i> Start Date</span>
+            <span class="axg-detail-stat__value" id="detailStartDate">—</span>
+          </div>
+
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label"><i class="fa-solid fa-flag-checkered"></i> End Date</span>
+            <span class="axg-detail-stat__value" id="detailEndDate">—</span>
+          </div>
+
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label"><i class="fa-regular fa-clock"></i> Current Day</span>
+            <span class="axg-detail-stat__value axg-detail-stat__value--highlight" id="detailCurrentDay">—</span>
+          </div>
+
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label"><i class="fa-solid fa-circle-dot"></i> Status</span>
+            <span class="axg-detail-stat__value" id="detailStatus">—</span>
+          </div>
+        </div>
+
+        <!-- Weight Metrics Summary -->
+        <div class="axg-detail-summary axg-detail-summary--weights">
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label">Starting Weight</span>
+            <span class="axg-detail-stat__value" id="detailStartWeight">—</span>
+          </div>
+
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label">Current Weight</span>
+            <span class="axg-detail-stat__value" id="detailCurrentWeight">—</span>
+          </div>
+
+          <div class="axg-detail-stat">
+            <span class="axg-detail-stat__label">Total Change</span>
+            <span class="axg-detail-stat__value" id="detailWeightChange">—</span>
+          </div>
+        </div>
+
+        <!-- 100-Day Progress Bar -->
+        <div class="axg-progress-section">
+          <div class="axg-progress-label">
+            <span><i class="fa-solid fa-bars-progress"></i> Challenge Progress</span>
+            <span id="detailProgressLabel">Day 0 / 100</span>
+          </div>
+          <div class="axg-progress-bar-track">
+            <div class="axg-progress-bar-fill" id="detailProgressFill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Day 100 Ending Weight Entry -->
+        <div class="axg-ending-weight-section">
+          <label class="axg-label" for="inputEndingWeight">
+            <i class="fa-solid fa-bullseye"></i> Official Ending Weight (kg) — Enter after Day 100
+          </label>
+          <div class="axg-ending-weight-row">
+            <input
+              type="number"
+              id="inputEndingWeight"
+              class="axg-input axg-input--inline"
+              placeholder="e.g. 75.0"
+              step="0.1"
+              min="1"
+            />
+            <button type="button" class="axg-btn axg-btn--primary" id="saveEndingWeight">
+              <i class="fa-solid fa-floppy-disk"></i> Save Ending Weight
+            </button>
+          </div>
+        </div>
+
+        <!-- Weight Progress Chart -->
+        <div class="axg-chart-section">
+          <h3 class="axg-section-title">
+            <i class="fa-solid fa-chart-line"></i> Weight Trajectory (100 Days)
+          </h3>
+          <div class="axg-chart-container">
+            <canvas id="weightChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Weekly Check-ins Accordion/Grid -->
+        <div class="axg-weekly-section">
+          <h3 class="axg-section-title">
+            <i class="fa-solid fa-calendar-week"></i> Weekly Weigh-in Milestones
+          </h3>
+          <div id="weeklyCheckinsContainer">
+            <!-- Dynamically populated by admin-app.js -->
+          </div>
+        </div>
+
+        <!-- ============================================
+             DAILY GYM CHECK-IN SECTION (5 STATS + GRID)
+        ============================================ -->
+        <div class="axg-daily-section">
+          <h3 class="axg-section-title">
+            <i class="fa-solid fa-calendar-days"></i> Daily Attendance & Workout Tracking
+          </h3>
+
+          <!-- 5 Attendance Stat Cards -->
+          <div class="axg-attendance-stats">
+
+            <div class="axg-att-stat axg-att-stat--completed">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-circle-check"></i></span>
+              <span class="axg-att-stat__value" id="attCompleted">0</span>
+              <span class="axg-att-stat__label">Completed</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--rest">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-bed"></i></span>
+              <span class="axg-att-stat__value" id="attRest">0</span>
+              <span class="axg-att-stat__label">Rest Days</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--not-entered">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-ban"></i></span>
+              <span class="axg-att-stat__value" id="attNotEntered">0</span>
+              <span class="axg-att-stat__label">Missed</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--not-recorded">
+              <span class="axg-att-stat__icon"><i class="fa-regular fa-square"></i></span>
+              <span class="axg-att-stat__value" id="attNotRecorded">0</span>
+              <span class="axg-att-stat__label">Pending</span>
+            </div>
+
+            <div class="axg-att-stat axg-att-stat--attendance">
+              <span class="axg-att-stat__icon"><i class="fa-solid fa-chart-column"></i></span>
+              <span class="axg-att-stat__value" id="attPercent">0%</span>
+              <span class="axg-att-stat__label">Discipline</span>
+            </div>
+
+          </div>
+
+          <!-- Legend Bar -->
+          <div class="axg-daily-legend">
+            <span class="axg-legend-item axg-legend-item--completed">
+              <span class="axg-legend-dot axg-legend-dot--completed"></span> Completed Workout
+            </span>
+            <span class="axg-legend-item axg-legend-item--rest">
+              <span class="axg-legend-dot axg-legend-dot--rest"></span> Rest / Recovery
+            </span>
+            <span class="axg-legend-item axg-legend-item--not-entered">
+              <span class="axg-legend-dot axg-legend-dot--not-entered"></span> Not Entered Gym
+            </span>
+            <span class="axg-legend-item axg-legend-item--not-recorded">
+              <span class="axg-legend-dot axg-legend-dot--not-recorded"></span> Not Recorded
+            </span>
+            <span class="axg-legend-item axg-legend-item--upcoming">
+              <span class="axg-legend-dot axg-legend-dot--upcoming"></span> Upcoming Day
+            </span>
+          </div>
+
+          <!-- 100-Day Interactive Cell Matrix -->
+          <div class="axg-daily-grid" id="dailyGrid">
+            <!-- 100 Day cells generated dynamically by admin-app.js -->
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Actions Footer -->
+      <div class="axg-modal__footer">
+        <button type="button" class="axg-btn axg-btn--danger" id="deleteClientBtn">
+          <i class="fa-regular fa-trash-can"></i> Delete Client
+        </button>
+        <button type="button" class="axg-btn axg-btn--whatsapp" id="sendWhatsappBtn">
+          <i class="fa-brands fa-whatsapp"></i> Send WhatsApp Report
+        </button>
+        <button type="button" class="axg-btn axg-btn--ghost" id="editClientBtn">
+          <i class="fa-regular fa-pen-to-square"></i> Edit Client
+        </button>
+        <button type="button" class="axg-btn axg-btn--ghost" id="closeDetailBtn">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 3: EDIT CLIENT
+  ================================================ -->
+  <div class="axg-modal-overlay" id="editClientModal" style="display:none;">
+    <div class="axg-modal">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-user-pen axg-modal__header-icon"></i>
+          <div>
+            <h2 class="axg-modal__title">Edit Client Profile</h2>
+            <p class="axg-modal__subtitle">Update client metrics and challenge baseline</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeEditClientModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="editClientForm" class="axg-modal__form">
+        <div class="axg-modal__body">
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="editClientName">
+              <i class="fa-solid fa-user"></i> Client Name
+            </label>
+            <input type="text" id="editClientName" class="axg-input" placeholder="e.g. Arun Kumar" required />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="editClientPhone">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp Phone Number
+            </label>
+            <input type="tel" id="editClientPhone" class="axg-input" placeholder="e.g. 919876543210" />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="editStartWeight">
+              <i class="fa-solid fa-weight-scale"></i> Starting Weight (kg)
+            </label>
+            <input type="number" id="editStartWeight" class="axg-input" placeholder="e.g. 82.5" step="0.1" min="1" required />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="editStartDate">
+              <i class="fa-solid fa-calendar-days"></i> Challenge Start Date
+            </label>
+            <input type="date" id="editStartDate" class="axg-input" required />
+          </div>
+
+          <div class="axg-form-preview" id="editDatePreview" style="display:none;">
+            <i class="fa-solid fa-flag-checkered axg-preview-icon"></i>
+            <div>
+              <span class="axg-form-preview__label">New End Date (Day 100):</span>
+              <strong class="axg-form-preview__value" id="editPreviewEndDate">—</strong>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="axg-modal__footer">
+          <button type="button" class="axg-btn axg-btn--ghost" id="cancelEditClient">Cancel</button>
+          <button type="submit" class="axg-btn axg-btn--primary" id="confirmEditClient">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 4: DELETE CONFIRMATION
+  ================================================ -->
+  <div class="axg-modal-overlay" id="deleteConfirmModal" style="display:none;">
+    <div class="axg-modal axg-modal--small">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-triangle-exclamation axg-modal__header-icon axg-modal__header-icon--danger"></i>
+          <div>
+            <h2 class="axg-modal__title">Delete Client Record</h2>
+            <p class="axg-modal__subtitle">Permanent action confirmation</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeDeleteModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="axg-modal__body">
+        <p class="axg-delete-warning">
+          Are you sure you want to permanently delete <strong id="deleteClientNameDisplay">this client</strong> and all associated 100-day records?
+        </p>
+        <p class="axg-delete-warning axg-delete-warning--sub">
+          This includes all daily gym check-ins, weekly weigh-ins, and analytics data. This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="axg-modal__footer">
+        <button type="button" class="axg-btn axg-btn--ghost" id="cancelDeleteClient">Cancel</button>
+        <button type="button" class="axg-btn axg-btn--danger" id="confirmDeleteClient">
+          <i class="fa-regular fa-trash-can"></i> Yes, Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 5: CREATE / EDIT PUBLIC CHALLENGE
+  ================================================ -->
+  <div class="axg-modal-overlay" id="challengeModal" style="display:none;">
+    <div class="axg-modal">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-trophy axg-modal__header-icon"></i>
+          <div>
+            <h2 class="axg-modal__title" id="challengeModalTitle">Create New Challenge</h2>
+            <p class="axg-modal__subtitle">Publish a public transformation challenge for athletes</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeChallengeModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="challengeForm" class="axg-modal__form">
+        <div class="axg-modal__body">
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputChallengeTitle">
+              <i class="fa-solid fa-heading"></i> Challenge Title
+            </label>
+            <input
+              type="text"
+              id="inputChallengeTitle"
+              class="axg-input"
+              placeholder="e.g. Alpha X 100-Day Challenge"
+              required
+            />
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputChallengeDesc">
+              <i class="fa-solid fa-align-left"></i> Description
+            </label>
+            <textarea
+              id="inputChallengeDesc"
+              class="axg-input axg-textarea"
+              rows="3"
+              placeholder="Describe the challenge goals, training expectations, and rules..."
+            ></textarea>
+          </div>
+
+          <div class="axg-form-row axg-form-row--2col">
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeDays">
+                <i class="fa-solid fa-hashtag"></i> Number of Days
+              </label>
+              <input
+                type="number"
+                id="inputChallengeDays"
+                class="axg-input"
+                value="100"
+                min="1"
+                max="365"
+                required
+              />
+            </div>
+
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeStatus">
+                <i class="fa-solid fa-circle-dot"></i> Status
+              </label>
+              <select id="inputChallengeStatus" class="axg-input axg-select">
+                <option value="active">Active (Accepting Workouts)</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="axg-form-row axg-form-row--2col">
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeStart">
+                <i class="fa-solid fa-calendar-day"></i> Start Date
+              </label>
+              <input
+                type="date"
+                id="inputChallengeStart"
+                class="axg-input"
+                required
+              />
+            </div>
+
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeEnd">
+                <i class="fa-solid fa-flag-checkered"></i> End Date
+              </label>
+              <input
+                type="date"
+                id="inputChallengeEnd"
+                class="axg-input"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="axg-form-row axg-form-row--2col">
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeImage">
+                <i class="fa-solid fa-image"></i> Cover Image URL (Optional)
+              </label>
+              <input
+                type="text"
+                id="inputChallengeImage"
+                class="axg-input"
+                placeholder="e.g. images/gym-hero.jpg or https://..."
+              />
+            </div>
+
+            <div class="axg-form-group">
+              <label class="axg-label" for="inputChallengeVisibility">
+                <i class="fa-solid fa-eye"></i> Public Visibility
+              </label>
+              <select id="inputChallengeVisibility" class="axg-input axg-select">
+                <option value="public">Public (Listed & Open to All)</option>
+                <option value="unlisted">Unlisted (Accessible via Direct Link only)</option>
+                <option value="private">Private (Admin & Assigned Athletes only)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputChallengeRules">
+              <i class="fa-solid fa-clipboard-list"></i> Challenge Rules & Accountability
+            </label>
+            <textarea
+              id="inputChallengeRules"
+              class="axg-input axg-textarea"
+              rows="2"
+              placeholder="e.g. 1. Complete all prescribed sets. 2. Record weight in KG and actual reps. 3. Rest 60-90s between sets."
+            ></textarea>
+          </div>
+
+          <div class="axg-form-group">
+            <label class="axg-label" for="inputChallengeRewards">
+              <i class="fa-solid fa-award"></i> Milestone Rewards & Badges
+            </label>
+            <input
+              type="text"
+              id="inputChallengeRewards"
+              class="axg-input"
+              placeholder="e.g. Day 7: Consistency Badge, Day 30: Warrior Badge, Day 100: Alpha X Finisher"
+            />
+          </div>
+
+        </div>
+
+        <div class="axg-modal__footer">
+          <button type="button" class="axg-btn axg-btn--ghost" id="cancelChallengeBtn">Cancel</button>
+          <button type="submit" class="axg-btn axg-btn--primary" id="saveChallengeBtn">
+            <i class="fa-solid fa-check"></i> Save & Publish Challenge
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 6: PUBLIC SHARE LINK MODAL
+  ================================================ -->
+  <div class="axg-modal-overlay" id="shareLinkModal" style="display:none;">
+    <div class="axg-modal">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-share-nodes axg-modal__header-icon"></i>
+          <div>
+            <h2 class="axg-modal__title">Public Challenge Link</h2>
+            <p class="axg-modal__subtitle">Share this link with athletes to join and complete workouts</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeShareLinkModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="axg-modal__body">
+        <div class="axg-share-card">
+          <div class="axg-share-card__badge">
+            <i class="fa-solid fa-circle-check"></i> Challenge Published
+          </div>
+          <h3 class="axg-share-card__title" id="shareChallengeTitleDisplay">Alpha X 100-Day Challenge</h3>
+          <p class="axg-share-card__sub">Anyone with this link can view daily workouts, start timers, and submit completions:</p>
+
+          <div class="axg-share-link-box">
+            <input type="text" id="shareLinkInput" class="axg-share-link-input" readonly />
+            <button type="button" class="axg-btn axg-btn--primary" id="copyShareLinkBtn">
+              <i class="fa-regular fa-copy"></i> Copy Link
+            </button>
+          </div>
+
+          <div class="axg-share-actions-row">
+            <a href="#" target="_blank" class="axg-btn axg-btn--ghost" id="previewShareLinkBtn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Public Challenge Page
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="axg-modal__footer">
+        <button type="button" class="axg-btn axg-btn--ghost" onclick="document.getElementById('shareLinkModal').style.display='none'">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 7: DAY-BY-DAY WORKOUT BUILDER (DAY 1-100)
+  ================================================ -->
+  <div class="axg-modal-overlay" id="workoutBuilderModal" style="display:none;">
+    <div class="axg-modal axg-modal--large" style="max-width: 860px; max-height: 90vh; overflow-y: auto;">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-dumbbell axg-modal__header-icon"></i>
+          <div>
+            <h2 class="axg-modal__title" id="wbChallengeTitle">Workout Builder (Day 1–100)</h2>
+            <p class="axg-modal__subtitle">Prescribe exercises, sets, reps, and rest timers for athletes</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeWorkoutBuilderModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="axg-modal__body">
+        <!-- Day Selector Strip (1 to 100) -->
+        <div style="margin-bottom: 16px;">
+          <label class="axg-label" style="margin-bottom: 8px; display: block;"><i class="fa-solid fa-calendar-days"></i> Select Challenge Day (1 to 100):</label>
+          <div id="wbDaysStrip" style="display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 12px; scrollbar-width: thin;">
+            <!-- Day pills generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Selected Day Info & Prescribed Exercises -->
+        <div class="axg-wb-day-content" id="wbDayContent">
+          <div class="axg-form-row axg-form-row--2col">
+            <div class="axg-form-group">
+              <label class="axg-label" for="wbDayTitleInput"><i class="fa-solid fa-heading"></i> Day Routine Title</label>
+              <input type="text" id="wbDayTitleInput" class="axg-input" placeholder="e.g. Day 1 — Chest & Triceps Hypertrophy" />
+            </div>
+            <div class="axg-form-group">
+              <label class="axg-label" for="wbDayRewardInput"><i class="fa-solid fa-award"></i> Day Milestone Reward</label>
+              <input type="text" id="wbDayRewardInput" class="axg-input" placeholder="e.g. +10 Daily Points" />
+            </div>
+          </div>
+          <div class="axg-form-group">
+            <label class="axg-label" for="wbDayDescInput"><i class="fa-solid fa-align-left"></i> Routine Focus & Instructions</label>
+            <input type="text" id="wbDayDescInput" class="axg-input" placeholder="e.g. Heavy barbell compound sets followed by isolation work." />
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+            <h3 style="font-size: 14px; font-weight: 700; color: var(--text-pure); display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-list-check" style="color: var(--red);"></i> Prescribed Exercises for this Day
+            </h3>
+            <button type="button" class="axg-btn axg-btn--ghost axg-btn--small" id="wbAddExerciseBtn">
+              <i class="fa-solid fa-plus"></i> Add Exercise
+            </button>
+          </div>
+
+          <div id="wbExercisesList" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Exercise cards rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="axg-modal__footer">
+        <button type="button" class="axg-btn axg-btn--ghost" id="closeWorkoutBuilderBtn">Close</button>
+        <button type="button" class="axg-btn axg-btn--primary" id="saveWorkoutDayBtn">
+          <i class="fa-solid fa-floppy-disk"></i> Save Day Routine
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================
+       MODAL 8: CHALLENGE DETAILS & CONTROL HUB
+  ================================================ -->
+  <div class="axg-modal-overlay" id="challengeDetailsModal" style="display:none;">
+    <div class="axg-modal axg-modal--wide" style="max-width: 820px; max-height: 92vh; overflow-y: auto;">
+
+      <div class="axg-modal__header">
+        <div class="axg-modal__title-group">
+          <i class="fa-solid fa-trophy axg-modal__header-icon" style="color: var(--red);"></i>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <h2 class="axg-modal__title" id="cdModalTitle">Alpha X 100 Day Challenge</h2>
+              <span class="axg-badge axg-badge--active" id="cdModalStatusBadge">ACTIVE</span>
+            </div>
+            <p class="axg-modal__subtitle" id="cdModalTagline">Challenge Details &amp; Administrative Controls</p>
+          </div>
+        </div>
+        <button type="button" class="axg-modal__close" id="closeChallengeDetailsModal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="axg-modal__body" style="display: flex; flex-direction: column; gap: 18px; padding: 20px 24px;">
+
+        <!-- Description Box -->
+        <div style="background: var(--surface-1); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 14px 18px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+            <i class="fa-solid fa-align-left" style="color: var(--red);"></i> Description
+          </span>
+          <p id="cdModalDesc" style="color: var(--text-primary); font-size: 13px; line-height: 1.6; margin: 0;">
+            The premier 100-day transformation challenge.
+          </p>
+        </div>
+
+        <!-- Metric Highlights Grid (Status, Start, End, Total Days, Participants, Completed Workouts, Progress) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Status</span>
+            <span id="cdModalStatus" style="font-size: 15px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+              🟢 Active
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Start Date</span>
+            <span id="cdModalStart" style="font-size: 15px; font-weight: 800; color: var(--text-pure); margin-top: 2px; display: block;">
+              —
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">End Date</span>
+            <span id="cdModalEnd" style="font-size: 15px; font-weight: 800; color: var(--text-pure); margin-top: 2px; display: block;">
+              —
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Total Days</span>
+            <span id="cdModalDays" style="font-size: 15px; font-weight: 800; color: var(--text-pure); margin-top: 2px; display: block;">
+              100 Days
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Participants</span>
+            <span id="cdModalParticipants" style="font-size: 15px; font-weight: 800; color: var(--red); margin-top: 2px; display: block;">
+              0 Athletes
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Completed Workouts</span>
+            <span id="cdModalCompletions" style="font-size: 15px; font-weight: 800; color: var(--blue); margin-top: 2px; display: block;">
+              0 Sessions
+            </span>
+          </div>
+          <div style="background: var(--surface-2); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block;">Completion Rate</span>
+            <span id="cdModalProgress" style="font-size: 15px; font-weight: 800; color: var(--green); margin-top: 2px; display: block;">
+              0%
+            </span>
+          </div>
+        </div>
+
+        <!-- Public Link Box -->
+        <div style="background: rgba(232, 0, 13, 0.04); border: 1px solid rgba(232, 0, 13, 0.25); border-radius: var(--radius-md); padding: 16px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+            <i class="fa-solid fa-link"></i> Public Challenge Link (Share with Athletes)
+          </span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" id="cdModalPublicLink" class="axg-input" readonly style="flex: 1; min-width: 240px; font-family: monospace; font-size: 12px;" />
+            <button type="button" class="axg-btn axg-btn--primary" id="cdModalCopyLinkBtn">
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy Public Link</span>
+            </button>
+            <a href="#" target="_blank" class="axg-btn axg-btn--ghost" id="cdModalOpenPublicBtn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Open Public Challenge</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Rules and Milestone Rewards Strip -->
+        <div id="cdModalRulesSection" style="display: flex; flex-direction: column; gap: 8px;">
+          <div id="cdModalRulesBox" style="background: var(--surface-1); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 10px 14px; font-size: 12px; color: var(--text-secondary); display: none;">
+            <strong style="color: var(--red);"><i class="fa-solid fa-clipboard-list"></i> Rules:</strong> <span id="cdModalRulesText"></span>
+          </div>
+          <div id="cdModalRewardsBox" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 10px 14px; font-size: 12px; color: #fbbf24; display: none;">
+            <strong><i class="fa-solid fa-award"></i> Rewards:</strong> <span id="cdModalRewardsText"></span>
+          </div>
+        </div>
+
+        <!-- Quick Admin Action Buttons Grid -->
+        <div>
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 10px;">
+            <i class="fa-solid fa-sliders" style="color: var(--red);"></i> Administrative Controls
+          </span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;">
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnEditChallenge">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Challenge
+            </button>
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnManageDays">
+              <i class="fa-solid fa-calendar-days"></i> Manage Days
+            </button>
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnManageExercises">
+              <i class="fa-solid fa-dumbbell"></i> Manage Exercises
+            </button>
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnManageRewards">
+              <i class="fa-solid fa-award"></i> Manage Rewards
+            </button>
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnViewParticipants">
+              <i class="fa-solid fa-users"></i> View Participants
+            </button>
+            <button type="button" class="axg-btn axg-btn--ghost" id="cdBtnViewAnalytics">
+              <i class="fa-solid fa-chart-line"></i> View Analytics
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="axg-modal__footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 11px; color: var(--text-dim);" id="cdModalCreatedAt">Created: —</span>
+        <button type="button" class="axg-btn axg-btn--ghost" id="closeChallengeDetailsFooterBtn">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Sidebar Toggle Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggleBtn = document.getElementById('sidebarToggle');
+      const sidebar   = document.getElementById('axgSidebar');
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', function () {
+          sidebar.classList.toggle('axg-sidebar--open');
+        });
+      }
+    });
+  </script>
+
+  <!-- Public Challenges Admin Controller (PostgreSQL + Prisma REST API) -->
+  <script src="admin-challenges.js"></script>
+
+  <!-- Gym Attendance Admin Controller (Dynamic QR + GPS Geofence + Auto Absent) -->
+  <script src="admin-attendance.js"></script>
+
+  <!-- Application Logic & Client Tracker (PostgreSQL + Prisma REST API) -->
+  <script src="admin-app.js"></script>
+
+</body>
+</html>
