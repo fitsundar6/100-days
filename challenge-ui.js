@@ -295,12 +295,18 @@
   // --- 2. GOOGLE IDENTITY SERVICES FOR CLIENT DASHBOARD ---
   async function initClientGoogleAuth() {
     try {
-      const res = await fetch(getApiUrl('/api/registration/config'));
-      const config = await res.json();
+      let clientId = '661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com';
+      try {
+        const res = await fetch(getApiUrl('/api/registration/config'));
+        const config = await res.json();
+        if (config && config.googleClientId) {
+          clientId = config.googleClientId;
+        }
+      } catch (cfgErr) {}
 
-      if (window.google && config.googleClientId) {
+      if (window.google && clientId) {
         window.google.accounts.id.initialize({
-          client_id: config.googleClientId,
+          client_id: clientId,
           callback: (response) => {
             handleClientGoogleAuth({ credential: response.credential });
           },
@@ -318,9 +324,8 @@
             shape: 'pill',
           });
         }
-      } else {
         const notice = document.getElementById('clientAuthNotice');
-        if (notice) notice.style.display = 'block';
+        if (notice) notice.style.display = 'none';
       }
     } catch (e) {
       console.warn('Google client init notice in dashboard:', e);

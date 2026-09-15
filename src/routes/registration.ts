@@ -8,12 +8,13 @@ import { queryWithTimeout } from '../lib/db-safe';
 const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
+export const DEFAULT_GOOGLE_CLIENT_ID = '661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com';
 
 /**
- * Dynamically resolves active Google Client ID at runtime from environment
+ * Dynamically resolves active Google Client ID at runtime from environment or verified project credentials
  */
 export function getGoogleClientId(): string {
-  return (process.env.GOOGLE_CLIENT_ID || '').trim();
+  return (process.env.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID).trim();
 }
 
 /**

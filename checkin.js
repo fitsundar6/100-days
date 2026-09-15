@@ -170,12 +170,18 @@
    */
   async function initGoogleOAuth() {
     try {
-      const res = await fetch(getApiUrl('/api/registration/config'));
-      const config = await res.json();
+      let clientId = '661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com';
+      try {
+        const res = await fetch(getApiUrl('/api/registration/config'));
+        const config = await res.json();
+        if (config && config.googleClientId) {
+          clientId = config.googleClientId;
+        }
+      } catch (cfgErr) {}
 
-      if (window.google && config.googleClientId) {
+      if (window.google && clientId) {
         window.google.accounts.id.initialize({
-          client_id: config.googleClientId,
+          client_id: clientId,
           callback: (response) => {
             submitGoogleAuth({ credential: response.credential });
           },
