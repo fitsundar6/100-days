@@ -6,6 +6,7 @@
 [build.environment]
   NODE_VERSION = "20"
   PRISMA_GENERATE_DATAPROXY = "false"
+  GOOGLE_CLIENT_ID = "661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com"
 
 [functions]
   node_bundler = "esbuild"
