@@ -5,8 +5,8 @@
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && tsc",
-    "postinstall": "prisma generate && tsc",
+    "build": "node scripts/build.js",
+    "postinstall": "node scripts/build.js",
     "build:netlify": "prisma generate && tsc",
     "start": "node dist/src/server.js",
     "start:prod": "prisma migrate deploy && node dist/src/server.js",
