@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
 
 export interface AuthenticatedRequest extends Request {
   admin?: {

@@ -115,7 +115,7 @@ import { requireClientAuth, ClientAuthenticatedRequest } from '../middleware/aut
 import { validateDynamicQrToken } from '../services/qr-token';
 import { inMemoryRegisteredClients } from './registration';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 

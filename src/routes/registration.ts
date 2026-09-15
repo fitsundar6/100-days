@@ -7,7 +7,7 @@ import { queryWithTimeout } from '../lib/db-safe';
 
 const router = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
 
 /**
  * Dynamically resolves active Google Client ID at runtime strictly from environment

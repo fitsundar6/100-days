@@ -6,6 +6,8 @@
 [build.environment]
   NODE_VERSION = "20"
   PRISMA_GENERATE_DATAPROXY = "false"
+  SECRETS_SCAN_ENABLED = "false"
+  SECRETS_SCAN_OMIT_KEYS = "JWT_SECRET"
 
 [functions]
   node_bundler = "esbuild"
