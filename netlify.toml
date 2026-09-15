@@ -1,0 +1,107 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PRISMA_GENERATE_DATAPROXY = "false"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = [
+    "prisma/schema.prisma",
+    "node_modules/.prisma/client/**",
+    "node_modules/@prisma/client/**"
+  ]
+
+# API routes -> Netlify Serverless Function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Health check aliases
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/api/health"
+  status = 200
+
+# Client Registration & Check-in Clean URLs
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/register/*"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/join"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/checkin"
+  to = "/checkin.html"
+  status = 200
+
+[[redirects]]
+  from = "/checkin/*"
+  to = "/checkin.html"
+  status = 200
+
+[[redirects]]
+  from = "/attendance"
+  to = "/checkin.html"
+  status = 200
+
+# Dedicated Gym Display Screens
+[[redirects]]
+  from = "/admin/gym-qr"
+  to = "/gym-qr.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/registration-qr"
+  to = "/registration-qr.html"
+  status = 200
+
+# Athlete Challenge Portal Clean URLs
+[[redirects]]
+  from = "/challenge"
+  to = "/challenge.html"
+  status = 200
+
+[[redirects]]
+  from = "/challenge/*"
+  to = "/challenge.html"
+  status = 200
+
+[[redirects]]
+  from = "/client"
+  to = "/challenge.html"
+  status = 200
+
+# Admin Dashboard Clean URLs & Root Fallback
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/"
+  to = "/admin.html"
+  status = 200

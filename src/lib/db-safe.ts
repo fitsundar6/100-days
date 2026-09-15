@@ -1,11 +1,14 @@
 /**
  * Safe Database Query Runner with Circuit Breaker
- * Prevents socket hanging and network timeouts when PostgreSQL is offline
+ * Prevents socket hanging and network timeouts while allowing full query latency on production PostgreSQL
  */
 
 let dbCircuitOpen = false;
 let dbLastFailureTime = 0;
-const DB_CIRCUIT_COOLDOWN_MS = 25000; // 25 seconds cooldown before retrying DB
+const DB_CIRCUIT_COOLDOWN_MS = 15000; // 15 seconds cooldown before retrying DB
+
+// Production cloud databases (e.g. Render, Supabase, Neon) over SSL need realistic query allowances
+const CONFIG_TIMEOUT_MS = parseInt(process.env.DB_TIMEOUT_MS || '6000', 10) || 6000;
 
 export function isDatabaseCircuitOpen(): boolean {
   if (dbCircuitOpen) {
@@ -27,10 +30,16 @@ export function resetDatabaseCircuit(): void {
   dbCircuitOpen = false;
 }
 
-export async function queryWithTimeout<T>(promise: Promise<T>, timeoutMs: number = 800): Promise<T | null> {
+export async function queryWithTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number = CONFIG_TIMEOUT_MS
+): Promise<T | null> {
   if (isDatabaseCircuitOpen()) {
     return null;
   }
+
+  // Ensure production cloud database calls have at least CONFIG_TIMEOUT_MS to negotiate SSL and execute
+  const effectiveTimeout = Math.max(timeoutMs, CONFIG_TIMEOUT_MS);
 
   try {
     let timer: any;
@@ -38,7 +47,7 @@ export async function queryWithTimeout<T>(promise: Promise<T>, timeoutMs: number
       timer = setTimeout(() => {
         tripDatabaseCircuit();
         resolve(null);
-      }, timeoutMs);
+      }, effectiveTimeout);
     });
 
     const result = await Promise.race([promise, timeoutPromise]);
@@ -52,3 +61,4 @@ export async function queryWithTimeout<T>(promise: Promise<T>, timeoutMs: number
     return null;
   }
 }
+

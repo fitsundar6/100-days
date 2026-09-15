@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc",
+    "build:netlify": "prisma generate && tsc",
     "start": "node dist/src/server.js",
     "start:prod": "prisma migrate deploy && node dist/src/server.js",
     "prisma:generate": "prisma generate",
@@ -35,16 +36,18 @@
     "express": "^5.2.1",
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.3",
-    "qrcode": "^1.5.4"
+    "prisma": "^6.4.1",
+    "qrcode": "^1.5.4",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
+    "@netlify/functions": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.3.0",
     "@types/qrcode": "^1.5.6",
-    "prisma": "^6.4.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

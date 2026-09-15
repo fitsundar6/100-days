@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import dotenv from 'dotenv';
 import prisma from './lib/prisma';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
@@ -10,9 +10,6 @@ import clientRoutes from './routes/client';
 import attendanceRoutes from './routes/attendance';
 import registrationRoutes from './routes/registration';
 import { initAttendanceScheduler } from './services/attendance-scheduler';
-
-// Load environment variables from .env
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,6 +46,7 @@ app.get('/api/health', async (_req: Request, res: Response) => {
 // REST API Endpoints
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/client', clientRoutes);
 app.use('/api/public', clientRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/registration', registrationRoutes);
@@ -76,7 +74,7 @@ app.get(['/register', '/register/', '/client-register', '/join', '/registration'
   res.sendFile(path.join(publicDir, 'register.html'));
 });
 
-app.get(['/challenge', '/challenge/', '/client', '/client/'], (_req: Request, res: Response) => {
+app.get(['/challenge', '/challenge/', '/client', '/client/', '/client-login', '/client-login/'], (_req: Request, res: Response) => {
   res.sendFile(path.join(publicDir, 'challenge.html'));
 });
 
@@ -118,33 +116,35 @@ app.use((err: any, _req: Request, res: Response, _next: any) => {
   });
 });
 
-// Start Server
-const server = app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 Alpha X Gym Server running at http://localhost:${PORT}`);
-  console.log(`📊 Admin Portal:      http://localhost:${PORT}/admin.html`);
-  console.log(`🔥 Public Challenge:  http://localhost:${PORT}/challenge.html`);
-  console.log(`💾 Database:          PostgreSQL via Prisma ORM`);
-  console.log(`====================================================`);
+// Start Server (only when running as standalone Node process, not in Netlify serverless)
+if (!process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  const server = app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 Alpha X Gym Server running at http://localhost:${PORT}`);
+    console.log(`📊 Admin Portal:      http://localhost:${PORT}/admin.html`);
+    console.log(`🔥 Public Challenge:  http://localhost:${PORT}/challenge.html`);
+    console.log(`💾 Database:          PostgreSQL via Prisma ORM`);
+    console.log(`====================================================`);
 
-  // Initialize automated attendance background scheduler (Asia/Kolkata)
-  initAttendanceScheduler();
-});
-
-// Graceful shutdown handling for cloud hosts (Render, Docker, Kubernetes)
-const handleGracefulShutdown = async (signal: string) => {
-  console.log(`\n🛑 Received ${signal}. Shutting down gracefully...`);
-  server.close(async () => {
-    try {
-      await prisma.$disconnect();
-      console.log('✅ PostgreSQL connection closed cleanly.');
-    } catch (e) {}
-    process.exit(0);
+    // Initialize automated attendance background scheduler (Asia/Kolkata)
+    initAttendanceScheduler();
   });
-};
 
-process.on('SIGTERM', () => handleGracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => handleGracefulShutdown('SIGINT'));
+  // Graceful shutdown handling for cloud hosts (Render, Docker, Kubernetes)
+  const handleGracefulShutdown = async (signal: string) => {
+    console.log(`\n🛑 Received ${signal}. Shutting down gracefully...`);
+    server.close(async () => {
+      try {
+        await prisma.$disconnect();
+        console.log('✅ PostgreSQL connection closed cleanly.');
+      } catch (e) {}
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => handleGracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => handleGracefulShutdown('SIGINT'));
+}
 
 export default app;
 

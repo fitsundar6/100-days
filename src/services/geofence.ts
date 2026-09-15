@@ -7,7 +7,7 @@ const DEFAULT_GYM_LNG = parseFloat(process.env.GYM_DEFAULT_LNG || '77.5946');
 const DEFAULT_ALLOWED_RADIUS = parseFloat(process.env.GYM_ALLOWED_RADIUS || '75.0'); // 75 meters
 
 // Maximum acceptable accuracy radius in meters before GPS is considered too imprecise (e.g. IP/cellular tower)
-const MAX_ALLOWED_ACCURACY_METERS = 65.0;
+const MAX_ALLOWED_ACCURACY_METERS = 150.0;
 
 export interface GeofenceVerificationResult {
   isWithinGeofence: boolean;
@@ -126,18 +126,22 @@ export async function verifyClientGeofence(
   // 4. Calculate Haversine distance from gym center to client
   const distanceMeters = calculateHaversineDistance(gymLat, gymLng, clientLat, clientLng);
 
-  // 5. Check if inside allowed radius (with modest indoor jitter buffer capped at 15m)
-  const indoorJitterAllowance = Math.min(accuracy * 0.25, 15);
+  // 5. Check if inside allowed radius (with modest indoor jitter buffer capped at 25m)
+  const indoorJitterAllowance = Math.min(accuracy * 0.35, 25);
   const effectiveRadius = allowedRadius + indoorJitterAllowance;
 
   if (distanceMeters > effectiveRadius) {
+    const formattedDistance = distanceMeters > 1000 
+      ? `${(distanceMeters / 1000).toFixed(1)} km` 
+      : `${Math.round(distanceMeters)} meters`;
+
     return {
       isWithinGeofence: false,
       distanceMeters,
       allowedRadiusMeters: allowedRadius,
       accuracyMeters: accuracy,
       gymName,
-      error: 'You appear to be outside the gym check-in area. Please check in from Alpha X Gym.',
+      error: `You are currently ${formattedDistance} away from ${gymName}. Allowed check-in radius is ${allowedRadius} meters.`,
     };
   }
 

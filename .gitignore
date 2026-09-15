@@ -24,3 +24,8 @@ scratch/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local Binaries and Executables
+*.exe
+cloudflared*
+

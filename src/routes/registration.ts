@@ -8,8 +8,13 @@ import { queryWithTimeout } from '../lib/db-safe';
 const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_super_secure_jwt_secret_key_2026';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
-const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+/**
+ * Dynamically resolves active Google Client ID at runtime from environment
+ */
+export function getGoogleClientId(): string {
+  return (process.env.GOOGLE_CLIENT_ID || '').trim();
+}
 
 /**
  * Resolves the public base URL for the application
@@ -17,10 +22,13 @@ const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
  * Automatically recognizes APP_URL, BASE_URL, and Render's RENDER_EXTERNAL_URL.
  */
 export function resolveBaseUrl(req: Request): string {
+  // 1. Explicit production domain takes top priority (Render APP_URL/RENDER_EXTERNAL_URL or Netlify URL)
   const envBaseUrl = (
     process.env.APP_URL ||
     process.env.BASE_URL ||
     process.env.RENDER_EXTERNAL_URL ||
+    process.env.URL ||
+    process.env.DEPLOY_PRIME_URL ||
     ''
   ).trim().replace(/\/+$/, '');
 
@@ -31,25 +39,27 @@ export function resolveBaseUrl(req: Request): string {
     return envBaseUrl;
   }
 
-  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https' || process.env.NODE_ENV === 'production';
-  const protocol = isSecure ? 'https' : (req.protocol || 'http');
-  const host = req.get('host') || 'localhost:3000';
-
-  let url = `${protocol}://${host}`;
-  if (process.env.NODE_ENV === 'production' && url.startsWith('http://') && !host.startsWith('localhost') && !host.startsWith('127.0.0.1')) {
-    url = url.replace(/^http:\/\//, 'https://');
+  // 2. Resolve from request host header (Render reverse proxy or custom domain)
+  const host = req.get('host') || '';
+  if (host && !host.startsWith('localhost') && !host.startsWith('127.0.0.1')) {
+    return `https://${host}`;
   }
-  return url;
+
+  // 3. Local development fallback
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const protocol = isSecure ? 'https' : (req.protocol || 'http');
+  return `${protocol}://${host || 'localhost:3000'}`;
 }
 
 /**
  * GET /api/registration/config
- * Returns public Google OAuth client ID
+ * Returns public Google OAuth client ID dynamically from environment
  */
 router.get('/config', (_req: Request, res: Response) => {
+  const clientId = getGoogleClientId();
   return res.json({
     success: true,
-    googleClientId: GOOGLE_CLIENT_ID,
+    googleClientId: clientId,
   });
 });
 
@@ -127,9 +137,11 @@ router.post('/auth/google', async (req: Request, res: Response) => {
     if (credential && typeof credential === 'string') {
       try {
         // 1. Verify with Google's public certificates
-        const ticket = await googleOAuthClient.verifyIdToken({
+        const clientId = getGoogleClientId();
+        const oauthClient = new OAuth2Client(clientId);
+        const ticket = await oauthClient.verifyIdToken({
           idToken: credential,
-          audience: GOOGLE_CLIENT_ID || undefined,
+          audience: clientId || undefined,
         });
         const payload = ticket.getPayload();
         if (!payload || !payload.sub) {
@@ -158,16 +170,10 @@ router.post('/auth/google', async (req: Request, res: Response) => {
           });
         }
       }
-    } else if (demoUser && typeof demoUser === 'object') {
-      // Allowed for frictionless testing / local demonstration
-      googleId = demoUser.googleId || `demo-google-${Date.now()}`;
-      email = demoUser.email ? String(demoUser.email).toLowerCase().trim() : 'sundar@gmail.com';
-      name = demoUser.name || 'Sundar';
-      avatarUrl = demoUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
     } else {
       return res.status(400).json({
         success: false,
-        error: 'Google authentication credential is required',
+        error: 'Google authentication credential is required. Please sign in with Google.',
       });
     }
 

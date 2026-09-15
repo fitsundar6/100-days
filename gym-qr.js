@@ -55,8 +55,9 @@
 
   function getApiUrl(path) {
     const isFile = window.location.protocol === 'file:';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const isNotPort3000 = window.location.port && window.location.port !== '3000';
-    const base = (isFile || isNotPort3000) ? 'http://localhost:3000' : '';
+    const base = (isFile || (isLocal && isNotPort3000)) ? 'http://localhost:3000' : '';
     return `${base}${path}`;
   }
 

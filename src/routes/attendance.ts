@@ -10,7 +10,7 @@ const router = Router();
  * Generates a short-lived, signed dynamic QR token for gym display
  * Accessible by gym monitors, TV kiosks, and admins
  */
-router.get('/qr-token', async (req: Request, res: Response) => {
+router.get(['/qr-token', '/dynamic-qr'], async (req: Request, res: Response) => {
   try {
     const baseUrl = resolveBaseUrl(req);
 
@@ -36,6 +36,39 @@ router.get('/qr-token', async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       error: 'Failed to generate dynamic gym QR code',
+    });
+  }
+});
+
+/**
+ * GET /api/attendance/token-status
+ * Validates whether a dynamic QR token is active and unexpired (< 30 seconds)
+ * Accessible by client check-in page upon scanning QR
+ */
+router.get('/token-status', async (req: Request, res: Response) => {
+  try {
+    const token = String(req.query.token || '').trim();
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        isValid: false,
+        rejectionReason: 'No QR token provided. Please scan the current gym screen.',
+      });
+    }
+
+    const validation = await validateDynamicQrToken(token);
+    return res.json({
+      success: true,
+      isValid: validation.isValid,
+      rejectionReason: validation.rejectionReason,
+      gymId: validation.gymId,
+    });
+  } catch (error: any) {
+    console.error('Error validating token status:', error);
+    return res.status(500).json({
+      success: false,
+      isValid: false,
+      rejectionReason: 'Server error validating dynamic QR token.',
     });
   }
 });
@@ -130,9 +163,11 @@ router.post('/auth/google', async (req: Request, res: Response) => {
     if (credential && typeof credential === 'string') {
       try {
         // 1. Verify with Google's public certificates
-        const ticket = await googleOAuthClient.verifyIdToken({
+        const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+        const oauthClient = new OAuth2Client(clientId);
+        const ticket = await oauthClient.verifyIdToken({
           idToken: credential,
-          audience: GOOGLE_CLIENT_ID || undefined,
+          audience: clientId || undefined,
         });
         const payload = ticket.getPayload();
         if (!payload || !payload.sub) {
@@ -161,16 +196,10 @@ router.post('/auth/google', async (req: Request, res: Response) => {
           });
         }
       }
-    } else if (demoUser && typeof demoUser === 'object') {
-      // Allowed for frictionless local demonstration / development
-      googleId = demoUser.googleId || `demo-google-${Date.now()}`;
-      email = demoUser.email ? String(demoUser.email).toLowerCase().trim() : 'athlete@alphaxgym.com';
-      name = demoUser.name || 'Sundar (Alpha Athlete)';
-      avatarUrl = demoUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
     } else {
       return res.status(400).json({
         success: false,
-        error: 'Google authentication credential is required',
+        error: 'Google authentication credential token is required. Please sign in with Google.',
       });
     }
 
@@ -275,6 +304,7 @@ router.post('/auth/google', async (req: Request, res: Response) => {
           updatedAt: new Date(),
         };
       }
+      inMemoryRegisteredClients.set(googleId, client);
     } else {
       // Update avatar or name if changed
       try {
@@ -524,7 +554,7 @@ router.post('/verify-location', requireClientAuth, async (req: ClientAuthenticat
  * Check 7: Exactly one attendance per day
  * Check 8: Active gym member status
  */
-router.post('/checkin', requireClientAuth, async (req: ClientAuthenticatedRequest, res: Response) => {
+router.post(['/checkin', '/check-in'], requireClientAuth, async (req: ClientAuthenticatedRequest, res: Response) => {
   try {
     const clientId = req.client?.id;
 
@@ -702,28 +732,34 @@ router.post('/checkin', requireClientAuth, async (req: ClientAuthenticatedReques
 
     // ALL 8 CHECKS PASSED: Record Attendance
     const now = new Date();
-    let createdAttendance = null;
+    let createdAttendance: any = null;
     const gymRecordId = gym?.id || qrValidation.gymId || 'default-gym-id';
 
     try {
-      createdAttendance = await prisma.gymAttendance.create({
-        data: {
-          clientId,
-          gymId: gymRecordId,
-          attendanceDate: todayDate,
-          checkInAt: now,
-          status: 'present',
-          latitude: clientLat,
-          longitude: clientLng,
-          gpsAccuracy: clientAcc,
-          distanceMeters: geofenceResult.distanceMeters,
-          locationVerified: true,
-          qrTokenId: qrValidation.qrTokenRecordId || null,
-          verificationMethod: 'dynamic_qr_gps',
-        },
-      });
+      createdAttendance = await queryWithTimeout(
+        prisma.gymAttendance.create({
+          data: {
+            clientId,
+            gymId: gymRecordId,
+            attendanceDate: todayDate,
+            checkInAt: now,
+            status: 'present',
+            latitude: clientLat,
+            longitude: clientLng,
+            gpsAccuracy: clientAcc,
+            distanceMeters: geofenceResult.distanceMeters,
+            locationVerified: true,
+            qrTokenId: qrValidation.qrTokenRecordId || null,
+            verificationMethod: 'dynamic_qr_gps',
+          },
+        }),
+        800
+      );
     } catch (createErr: any) {
       console.warn('Prisma create attendance fallback:', createErr.message);
+    }
+
+    if (!createdAttendance) {
       // In-memory fallback representation if DB is reconnecting
       createdAttendance = {
         id: `att-${Date.now()}`,
@@ -782,24 +818,30 @@ router.post('/checkin', requireClientAuth, async (req: ClientAuthenticatedReques
         const dayNumber = Math.min(Math.max(dayDiff + 1, 1), ch.totalDays);
 
         // Fetch workout day title
-        let workoutDay = await prisma.workoutDay.findUnique({
-          where: {
-            uq_challenge_day: {
-              challengeId: ch.id,
-              dayNumber,
+        let workoutDay = await queryWithTimeout(
+          prisma.workoutDay.findUnique({
+            where: {
+              uq_challenge_day: {
+                challengeId: ch.id,
+                dayNumber,
+              },
             },
-          },
-        });
+          }),
+          500
+        );
 
         // Check if workout completion already exists today
-        const completion = await prisma.workoutCompletion.findUnique({
-          where: {
-            uq_participant_day_completion: {
-              participantId: activePart.id,
-              workoutDayId: workoutDay?.id || '',
+        const completion = await queryWithTimeout(
+          prisma.workoutCompletion.findUnique({
+            where: {
+              uq_participant_day_completion: {
+                participantId: activePart.id,
+                workoutDayId: workoutDay?.id || '',
+              },
             },
-          },
-        });
+          }),
+          500
+        );
 
         const workoutStatus = completion?.status === 'completed'
           ? 'COMPLETED'
@@ -927,7 +969,8 @@ router.get('/daily-summary', async (req: Request, res: Response) => {
     } catch (e) {}
 
     if (totalActiveClients === 0) {
-      totalActiveClients = Math.max(attendances.length, 3);
+      const memActive = Array.from(inMemoryRegisteredClients.values()).filter(c => c.status === 'active').length;
+      totalActiveClients = Math.max(attendances.length, memActive);
     }
 
     const presentCount = attendances.filter((a) => a.status.toLowerCase() === 'present').length;
@@ -980,10 +1023,10 @@ router.get('/daily-summary', async (req: Request, res: Response) => {
  */
 
 /**
- * GET /api/attendance/dashboard
+ * GET /api/attendance/dashboard, /api/attendance/records, /api/attendance/admin/records
  * Returns live attendance KPIs and enriched athlete records with workout completion status
  */
-router.get('/dashboard', async (req: Request, res: Response) => {
+router.get(['/dashboard', '/records', '/admin/records'], async (req: Request, res: Response) => {
   try {
     const targetDate = (req.query.date as string) || getKolkataDateString();
 
@@ -1006,13 +1049,13 @@ router.get('/dashboard', async (req: Request, res: Response) => {
       if (dbClients && dbClients.length > 0) activeClients = dbClients;
     } catch (e) {}
 
-    // Fallback if DB offline
-    if (activeClients.length === 0) {
-      activeClients = [
-        { id: 'client-1', name: 'Sundar Pichai', email: 'sundar@example.com', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', status: 'active' },
-        { id: 'client-2', name: 'Arun Kumar', email: 'arun@example.com', avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', status: 'active' },
-        { id: 'client-3', name: 'Rahul Sharma', email: 'rahul@example.com', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', status: 'active' },
-      ];
+    // Merge real registered clients if not already in activeClients
+    if (inMemoryRegisteredClients.size > 0) {
+      for (const mem of inMemoryRegisteredClients.values()) {
+        if (mem.status === 'active' && !activeClients.some((c: any) => c.id === mem.id || (mem.email && c.email === mem.email))) {
+          activeClients.push(mem);
+        }
+      }
     }
 
     // 2. Fetch attendances for target date
@@ -1037,10 +1080,19 @@ router.get('/dashboard', async (req: Request, res: Response) => {
       attendances = inMemoryAttendanceList.filter((a) => a.attendanceDate === targetDate);
     }
 
-    // 3. Map attendances by clientId
+    // 3. Map attendances by clientId and ensure client is in activeClients
     const attendanceByClient = new Map<string, any>();
     for (const att of attendances) {
       attendanceByClient.set(att.clientId, att);
+      if (att.client && !activeClients.some((c: any) => c.id === att.clientId)) {
+        activeClients.push({
+          id: att.client.id || att.clientId,
+          name: att.client.name,
+          email: att.client.email,
+          avatarUrl: att.client.avatarUrl,
+          status: 'active',
+        });
+      }
     }
 
     // 4. Fetch today's workout completions

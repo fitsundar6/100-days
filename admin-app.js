@@ -1427,7 +1427,7 @@ async function syncFromPostgres() {
     const res = await fetch('/api/admin/clients');
     if (res.ok) {
       const data = await res.json();
-      if (data.success && Array.isArray(data.clients) && data.clients.length > 0) {
+      if (data.success && Array.isArray(data.clients)) {
         const local = loadClients();
         const merged = data.clients.map(c => {
           const lMatch = local.find(l => l.id === c.id || l.phone === c.phone || (c.email && l.email === c.email));
@@ -1435,12 +1435,12 @@ async function syncFromPostgres() {
             id: c.id,
             name: c.name,
             phone: c.phone || lMatch?.phone || '',
-            email: c.email || lMatch?.email || '',
+            email: c.email || '',
             avatarUrl: c.avatarUrl || lMatch?.avatarUrl || null,
             status: c.status || lMatch?.status || 'Active',
-            startingWeight: c.startingWeight || lMatch?.startingWeight || 80,
+            startingWeight: c.startingWeight || lMatch?.startingWeight || 0,
             endingWeight: c.endingWeight || lMatch?.endingWeight || null,
-            currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight,
+            currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight || 0,
             targetWeight: c.targetWeight || lMatch?.targetWeight || null,
             startDate: lMatch?.startDate || toInputDate(c.registeredAt || c.createdAt || new Date()),
             endDate: lMatch?.endDate || toInputDate(addDays(c.registeredAt || c.createdAt || new Date(), 99)),

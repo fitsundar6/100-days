@@ -34,8 +34,9 @@
 
   function getApiUrl(path) {
     const isFile = window.location.protocol === 'file:';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const isNotPort3000 = window.location.port && window.location.port !== '3000';
-    const base = (isFile || isNotPort3000) ? 'http://localhost:3000' : '';
+    const base = (isFile || (isLocal && isNotPort3000)) ? 'http://localhost:3000' : '';
     return `${base}${path}`;
   }
 
@@ -51,7 +52,7 @@
   }
 
   /**
-   * Check if token is present and valid
+   * Check if token is present and valid on server
    */
   async function inspectTokenStatus() {
     if (!tokenBanner || !tokenStatusText || !tokenStatusIcon) return;
@@ -60,6 +61,10 @@
       tokenBanner.className = 'token-status-banner invalid';
       tokenStatusIcon.className = 'fa-solid fa-triangle-exclamation token-status-icon';
       tokenStatusText.innerHTML = '<strong>No QR token detected.</strong> Please point your camera at the current gym display screen.';
+      if (btnVerifyLocation) {
+        btnVerifyLocation.disabled = true;
+        btnVerifyLocation.style.opacity = '0.5';
+      }
       return;
     }
 
@@ -72,17 +77,24 @@
         tokenStatusIcon.className = 'fa-solid fa-circle-check token-status-icon';
         tokenStatusText.innerHTML = '<strong>Dynamic QR Token Verified.</strong> Server signed and ready for attendance check.';
         if (proceedStepMsg) proceedStepMsg.style.display = 'block';
+        if (btnVerifyLocation) {
+          btnVerifyLocation.disabled = false;
+          btnVerifyLocation.style.opacity = '1';
+        }
       } else {
         tokenBanner.className = 'token-status-banner invalid';
         tokenStatusIcon.className = 'fa-solid fa-circle-xmark token-status-icon';
         tokenStatusText.innerHTML = `<strong>QR Code Expired:</strong> ${data.rejectionReason || 'Please scan the current gym QR code.'}`;
         if (proceedStepMsg) proceedStepMsg.style.display = 'none';
+        if (btnVerifyLocation) {
+          btnVerifyLocation.disabled = true;
+          btnVerifyLocation.style.opacity = '0.5';
+        }
       }
     } catch (e) {
-      // Offline fallback
-      tokenBanner.className = 'token-status-banner valid';
-      tokenStatusIcon.className = 'fa-solid fa-circle-check token-status-icon';
-      tokenStatusText.innerHTML = '<strong>Dynamic QR Token Captured.</strong> Proceed with check-in.';
+      tokenBanner.className = 'token-status-banner invalid';
+      tokenStatusIcon.className = 'fa-solid fa-triangle-exclamation token-status-icon';
+      tokenStatusText.innerHTML = '<strong>QR Verification Pending.</strong> Checking status with gym server...';
     }
   }
 
@@ -124,7 +136,7 @@
     if (memberSection) memberSection.style.display = 'block';
 
     if (memberName) memberName.textContent = client.name || 'Alpha Athlete';
-    if (memberEmail) memberEmail.textContent = client.email || 'Google Verified';
+    if (memberEmail) memberEmail.textContent = client.email || 'Verified Google Account';
     if (memberAvatar) {
       memberAvatar.src = client.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
     }
@@ -139,42 +151,63 @@
   }
 
   /**
-   * Log out client
+   * Log out client completely
    */
   function signOut() {
     localStorage.removeItem('axg_client_token');
     localStorage.removeItem('axg_client_profile');
+    localStorage.removeItem('axg_current_client');
+    localStorage.removeItem('axg_current_participant');
+    localStorage.removeItem('axg_today_attendance');
+    localStorage.removeItem('axg_today_challenge');
+    sessionStorage.removeItem('axg_pending_qr_token');
     renderUnauthenticatedState();
     inspectTokenStatus();
+  }
+
+  /**
+   * Initialize Official Google Identity Services SDK
+   */
+  async function initGoogleOAuth() {
+    try {
+      const res = await fetch(getApiUrl('/api/registration/config'));
+      const config = await res.json();
+
+      if (window.google && config.googleClientId) {
+        window.google.accounts.id.initialize({
+          client_id: config.googleClientId,
+          callback: (response) => {
+            submitGoogleAuth({ credential: response.credential });
+          },
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        const target = document.getElementById('googleSignInCheckinBtn');
+        if (target) {
+          window.google.accounts.id.renderButton(target, {
+            theme: 'filled_black',
+            size: 'large',
+            width: 320,
+            text: 'continue_with',
+            shape: 'pill',
+          });
+          if (btnGoogleSignIn) btnGoogleSignIn.style.display = 'none';
+        }
+      }
+    } catch (e) {
+      console.warn('Google client initialization note:', e);
+    }
   }
 
   // Google Login click handler
   if (btnGoogleSignIn) {
     btnGoogleSignIn.addEventListener('click', () => {
-      // In development or when OAuth client ID is pending, provide frictionless verification
-      showAlert('Connecting with Google Identity Services...');
-      submitGoogleAuth({
-        demoUser: {
-          googleId: `google-user-${Date.now()}`,
-          name: 'Sundar Pichai',
-          email: 'sundar.pichai@alphaxgym.com',
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-        },
-      });
-    });
-  }
-
-  // Demo Login click handler
-  if (btnDemoLogin) {
-    btnDemoLogin.addEventListener('click', () => {
-      submitGoogleAuth({
-        demoUser: {
-          googleId: 'google-sub-demo-sundar',
-          name: 'Sundar (Alpha Athlete)',
-          email: 'sundar@alphaxgym.com',
-          avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-        },
-      });
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.prompt();
+      } else {
+        showAlert('Google Sign-In is unavailable. Please check your internet connection or reload.');
+      }
     });
   }
 
@@ -186,17 +219,9 @@
   // GPS GEOFENCE VERIFICATION
   // ==============================================
   const btnVerifyLocation = document.getElementById('btnVerifyLocation');
-  const btnSimulateGymLocation = document.getElementById('btnSimulateGymLocation');
   const gpsStatusBox = document.getElementById('gpsStatusBox');
   const gpsStatusIcon = document.getElementById('gpsStatusIcon');
   const gpsStatusText = document.getElementById('gpsStatusText');
-
-  // Allow dev simulation if on localhost or non-mobile
-  if (btnSimulateGymLocation) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      btnSimulateGymLocation.style.display = 'flex';
-    }
-  }
 
   /**
    * Submit check-in to server with full 8-point security validation
@@ -390,13 +415,6 @@
     btnVerifyLocation.addEventListener('click', requestDeviceLocation);
   }
 
-  if (btnSimulateGymLocation) {
-    btnSimulateGymLocation.addEventListener('click', () => {
-      // Coordinates of Alpha X Gym (12.9716, 77.5946, 12m accuracy)
-      submitCheckinToServer(12.9716, 77.5946, 12.0);
-    });
-  }
-
   // Check initial login state
   const storedToken = localStorage.getItem('axg_client_token');
   const storedProfile = localStorage.getItem('axg_client_profile');
@@ -413,5 +431,6 @@
   }
 
   inspectTokenStatus();
+  initGoogleOAuth();
 
 })();

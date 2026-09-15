@@ -620,12 +620,9 @@
         <div class="google-btn-wrapper">
           <!-- Official Google Sign-In Container -->
           <div id="googleSignInBtn"></div>
-
-          <!-- Fast Demo Google Sign-In for frictionless testing -->
-          <button type="button" class="btn-demo-google" id="btnDemoGoogle">
-            <i class="fa-brands fa-google" style="color: #ea4335;"></i>
-            <span>Continue with Google (Fast Demo)</span>
-          </button>
+          <div id="googleAuthNotice" style="display:none; margin-top:12px; font-size:12px; color: #ffb74d; background: rgba(255,183,77,0.1); border: 1px solid rgba(255,183,77,0.3); border-radius: 8px; padding: 10px 14px; text-align: center;">
+            <i class="fa-solid fa-circle-exclamation"></i> Google Client ID is not configured. Please set <code>GOOGLE_CLIENT_ID</code> in <code>.env</code>.
+          </div>
         </div>
 
         <div class="security-notice" style="margin-top: 20px;">
@@ -667,8 +664,8 @@
         <div class="existing-profile-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; margin-bottom: 24px;">
           <img id="existingAvatar" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 3px solid var(--red-primary); box-shadow: 0 4px 16px rgba(0,0,0,0.5);" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Member Avatar" />
           <div>
-            <div style="font-family: var(--font-brand); font-size: 20px; font-weight: 800; color: var(--text-pure);" id="existingName">Sundar</div>
-            <div style="font-size: 13px; color: var(--text-muted); word-break: break-all;" id="existingEmail">sundar@gmail.com</div>
+            <div style="font-family: var(--font-brand); font-size: 20px; font-weight: 800; color: var(--text-pure);" id="existingName">Alpha Athlete</div>
+            <div style="font-size: 13px; color: var(--text-muted); word-break: break-all;" id="existingEmail">athlete@gmail.com</div>
           </div>
           <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 4px;">
             <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
@@ -750,7 +747,7 @@
             <label class="form-label" for="inputFullName">
               <i class="fa-solid fa-user"></i> Full Name <span style="color: var(--red-primary);">*</span>
             </label>
-            <input type="text" id="inputFullName" class="form-input" placeholder="e.g. Sundar Pichai" required />
+            <input type="text" id="inputFullName" class="form-input" placeholder="e.g. Alex Hunter" required />
             <span class="form-hint">Your official athlete name on gym leaderboards</span>
           </div>
 
@@ -815,8 +812,8 @@
         <div class="profile-preview-card">
           <img id="previewPhotoImg" class="preview-avatar" src="" alt="Athlete Photo" />
           <div>
-            <div class="preview-name" id="previewNameVal">Sundar</div>
-            <div class="preview-email" id="previewEmailVal">sundar@gmail.com</div>
+            <div class="preview-name" id="previewNameVal">Alpha Athlete</div>
+            <div class="preview-email" id="previewEmailVal">athlete@gmail.com</div>
           </div>
 
           <div class="preview-data-grid">
@@ -881,8 +878,8 @@
         <div class="existing-profile-card">
           <img id="successAvatar" class="client-avatar-preview" src="" alt="Athlete Avatar" />
           <div>
-            <div class="client-name-display" id="successName">Sundar</div>
-            <div class="client-email-display" id="successEmail">sundar@gmail.com</div>
+            <div class="client-name-display" id="successName">Alpha Athlete</div>
+            <div class="client-email-display" id="successEmail">athlete@gmail.com</div>
           </div>
           <div class="meta-pills-row" style="flex-direction: column; align-items: center; gap: 8px;">
             <div class="meta-pill" style="width: 100%; justify-content: space-between;">
@@ -967,7 +964,6 @@
       const btnBackToEdit = document.getElementById('btnBackToEdit');
 
       // Action Buttons
-      const btnDemoGoogle = document.getElementById('btnDemoGoogle');
       const btnSwitchAccount = document.getElementById('btnSwitchAccount');
 
       // State
@@ -1187,7 +1183,7 @@
 
           // Populate Success Screen
           successAvatar.src = data.client.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
-          successName.textContent = data.client.name || 'Sundar';
+          successName.textContent = data.client.name || 'Alpha Athlete';
           successEmail.textContent = data.client.email || 'Verified Member';
           successWeight.textContent = `${data.client.startingWeight || data.client.currentWeight || '—'} kg`;
           successDate.textContent = data.client.formattedRegistrationDate || new Date().toLocaleDateString('en-GB', {
@@ -1232,24 +1228,13 @@
                 shape: 'pill',
               }
             );
+          } else {
+            const notice = document.getElementById('googleAuthNotice');
+            if (notice) notice.style.display = 'block';
           }
         } catch (e) {
           console.warn('Google client init notice:', e);
         }
-      }
-
-      // Demo Google Sign-In Button
-      if (btnDemoGoogle) {
-        btnDemoGoogle.addEventListener('click', () => {
-          handleGoogleAuthPayload({
-            demoUser: {
-              googleId: 'google-sub-sundar-2026',
-              email: 'sundar@gmail.com',
-              name: 'Sundar',
-              avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-            },
-          });
-        });
       }
 
       // Switch Account button

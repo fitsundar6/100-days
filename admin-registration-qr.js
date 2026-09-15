@@ -37,10 +37,10 @@
    * Resolves the public production registration URL
    */
   function getFallbackRegistrationUrl() {
-    if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+    if (window.location.protocol.startsWith('http')) {
       return `${window.location.origin}/register`;
     }
-    return 'https://dc07ca2e087e5d.lhr.life/register';
+    return 'http://localhost:3000/register';
   }
 
   /**

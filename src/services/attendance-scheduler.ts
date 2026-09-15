@@ -6,6 +6,7 @@ import {
   inMemoryDailyCheckins,
   inMemoryAttendanceList,
 } from '../routes/attendance';
+import { inMemoryRegisteredClients } from '../routes/registration';
 
 export interface AbsentJobResult {
   date: string;
@@ -70,13 +71,17 @@ export async function processAutomaticAbsentJob(
     console.warn('DB lookup error for active clients during absent job');
   }
 
-  // Fallback: If DB query returned 0, ensure we have mock representation
-  if (activeClients.length === 0) {
-    activeClients = [
-      { id: 'client-1', name: 'Sundar Pichai', email: 'sundar@example.com' },
-      { id: 'client-2', name: 'Arun Kumar', email: 'arun@example.com' },
-      { id: 'client-3', name: 'Rahul Sharma', email: 'rahul@example.com' },
-    ];
+  // Merge real registered clients from in-memory fallback store
+  if (inMemoryRegisteredClients.size > 0) {
+    for (const mem of inMemoryRegisteredClients.values()) {
+      if (mem.status === 'active' && !activeClients.some((c: any) => c.id === mem.id || (mem.email && c.email === mem.email))) {
+        activeClients.push({
+          id: mem.id,
+          name: mem.name,
+          email: mem.email,
+        });
+      }
+    }
   }
 
   // 4. Fetch existing attendances for the target date
@@ -92,6 +97,20 @@ export async function processAutomaticAbsentJob(
     if (attendances) existingAttendances = attendances;
   } catch (e) {
     console.warn('DB lookup error for existing attendances during absent job');
+  }
+
+  // Merge in-memory attendances for target date
+  for (const att of inMemoryAttendanceList) {
+    if (att.attendanceDate === dateStr && !existingAttendances.some((a) => a.clientId === att.clientId)) {
+      existingAttendances.push({ clientId: att.clientId, status: att.status });
+    }
+  }
+  for (const client of activeClients) {
+    const memKey = `${client.id}_${dateStr}`;
+    const memRecord = inMemoryDailyCheckins.get(memKey);
+    if (memRecord && !existingAttendances.some((a) => a.clientId === client.id)) {
+      existingAttendances.push({ clientId: client.id, status: memRecord.status });
+    }
   }
 
   const attendedClientIds = new Set(existingAttendances.map((a) => a.clientId));
@@ -234,9 +253,15 @@ async function checkAndRunEndOfDayJob() {
     const [curHour] = currentHourMin.split(':').map(Number);
     const [closeHour] = closeTime.split(':').map(Number);
 
-    // Only run after closing time (e.g. 22:00 to 23:59), not before opening time (e.g. 02:00 AM)
+    // Only run after closing time (e.g. 22:00 to 23:59), or post-midnight for yesterday
     if (curHour >= closeHour) {
       await processAutomaticAbsentJob(todayDate, false);
+    } else if (curHour < 5) {
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const yesterdayDate = getKolkataDateString(yesterday);
+      if (!processedDates.has(yesterdayDate)) {
+        await processAutomaticAbsentJob(yesterdayDate, true);
+      }
     }
   }
 }
