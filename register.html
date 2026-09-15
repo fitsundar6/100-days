@@ -1205,18 +1205,12 @@
       // Initialize Official Google Identity Services
       async function initGoogleOAuth() {
         try {
-          let clientId = '661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com';
-          try {
-            const res = await fetch('/api/registration/config');
-            const config = await res.json();
-            if (config && config.googleClientId) {
-              clientId = config.googleClientId;
-            }
-          } catch (cfgErr) {}
+          const res = await fetch('/api/registration/config');
+          const config = await res.json();
 
-          if (window.google && clientId) {
+          if (window.google && config && config.googleClientId) {
             window.google.accounts.id.initialize({
-              client_id: clientId,
+              client_id: config.googleClientId,
               callback: (response) => {
                 handleGoogleAuthPayload({ credential: response.credential });
               },
@@ -1239,9 +1233,14 @@
             }
             const notice = document.getElementById('googleAuthNotice');
             if (notice) notice.style.display = 'none';
+          } else {
+            const notice = document.getElementById('googleAuthNotice');
+            if (notice) notice.style.display = 'block';
           }
         } catch (e) {
           console.warn('Google client init notice:', e);
+          const notice = document.getElementById('googleAuthNotice');
+          if (notice) notice.style.display = 'block';
         }
       }
 

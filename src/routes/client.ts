@@ -370,7 +370,7 @@ router.post('/auth/google', async (req: Request, res: Response) => {
     let avatarUrl: string | null = null;
 
     try {
-      const clientId = (process.env.GOOGLE_CLIENT_ID || '661072520427-500vtigts0bad6rruv7c8sdp5lqiujll.apps.googleusercontent.com').trim();
+      const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
       const oauthClient = new OAuth2Client(clientId);
       const ticket = await oauthClient.verifyIdToken({
         idToken: credential,
