@@ -9,16 +9,18 @@ const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
 
+export const FALLBACK_GOOGLE_CLIENT_ID = '661072520427-ntrkjvfob7eptc9fvnaaga087agikupr.apps.googleusercontent.com';
+
 /**
- * Dynamically resolves active Google Client ID at runtime strictly from environment
+ * Dynamically resolves active Google Client ID at runtime from environment or verified fallback
  */
 export function getGoogleClientId(): string {
-  return (process.env.GOOGLE_CLIENT_ID || '').trim();
+  return (process.env.GOOGLE_CLIENT_ID || FALLBACK_GOOGLE_CLIENT_ID).trim();
 }
 
 /**
  * Resolves the public base URL for the application
- * Guarantees HTTPS and production domain priority over local fallback.
+ * Guarantees HTTPS for public reverse proxy/cloud domains while properly preserving HTTP for local/LAN IPs.
  * Automatically recognizes APP_URL, BASE_URL, and Render's RENDER_EXTERNAL_URL.
  */
 export function resolveBaseUrl(req: Request): string {
@@ -41,12 +43,21 @@ export function resolveBaseUrl(req: Request): string {
 
   // 2. Resolve from request host header (Render reverse proxy or custom domain)
   const host = req.get('host') || '';
-  if (host && !host.startsWith('localhost') && !host.startsWith('127.0.0.1')) {
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
+  // Check if host is a local/private network address (localhost, 127.0.0.1, 192.168.x, 10.x, 172.x)
+  const isLocalOrPrivate = !host ||
+    host.startsWith('localhost') ||
+    host.startsWith('127.0.0.1') ||
+    host.startsWith('192.168.') ||
+    host.startsWith('10.') ||
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host);
+
+  if (host && !isLocalOrPrivate) {
     return `https://${host}`;
   }
 
-  // 3. Local development fallback
-  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  // 3. Local/LAN development fallback
   const protocol = isSecure ? 'https' : (req.protocol || 'http');
   return `${protocol}://${host || 'localhost:3000'}`;
 }
@@ -497,30 +508,13 @@ router.post('/submit', async (req: Request, res: Response) => {
       });
       client = txResult.savedClient;
       participant = txResult.participantRecord;
+      console.log(`✅ Client successfully registered and permanently saved to PostgreSQL: [${client.id}] ${client.name} (${client.email})`);
     } catch (dbErr: any) {
-      console.warn('Database transaction fallback for registration:', dbErr);
-      const clientId = `client-${googleId}`;
-      client = {
-        id: clientId,
-        googleId,
-        name: trimmedName,
-        phone: sanitizedPhone,
-        email: verifiedEmail,
-        avatarUrl: sanitizedPhoto,
-        startingWeight: normalizedWeight,
-        currentWeight: normalizedWeight,
-        status: 'active',
-        registeredAt: registrationDate,
-        createdAt: registrationDate,
-        updatedAt: registrationDate,
-      };
-      participant = {
-        id: `part-${clientId}`,
-        clientId: clientId,
-        challengeId: 'default-100-day',
-        status: 'active',
-      };
-      inMemoryRegisteredClients.set(googleId, client);
+      console.error('❌ Database transaction failed for client registration:', dbErr);
+      return res.status(500).json({
+        success: false,
+        error: `Database write failed: ${dbErr.message || 'Could not permanently save member to database. Please try again.'}`,
+      });
     }
 
     // 5. Issue 7-Day Client Session JWT

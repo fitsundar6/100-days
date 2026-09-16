@@ -113,11 +113,9 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { requireClientAuth, ClientAuthenticatedRequest } from '../middleware/auth';
 import { validateDynamicQrToken } from '../services/qr-token';
-import { inMemoryRegisteredClients } from './registration';
+import { inMemoryRegisteredClients, getGoogleClientId } from './registration';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
-const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 /**
  * Helper to get current calendar date string (YYYY-MM-DD) in Asia/Kolkata
@@ -163,7 +161,7 @@ router.post('/auth/google', async (req: Request, res: Response) => {
     if (credential && typeof credential === 'string') {
       try {
         // 1. Verify with Google's public certificates
-        const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+        const clientId = getGoogleClientId();
         const oauthClient = new OAuth2Client(clientId);
         const ticket = await oauthClient.verifyIdToken({
           idToken: credential,

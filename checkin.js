@@ -165,17 +165,37 @@
     inspectTokenStatus();
   }
 
+  const FALLBACK_GOOGLE_CLIENT_ID = '661072520427-ntrkjvfob7eptc9fvnaaga087agikupr.apps.googleusercontent.com';
+
   /**
-   * Initialize Official Google Identity Services SDK
+   * Initialize Official Google Identity Services SDK with polling and fallback
    */
-  async function initGoogleOAuth() {
+  async function initGoogleOAuth(retryCount = 0) {
+    // If Google Identity script is still downloading (async defer), wait and retry
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+      if (retryCount < 25) {
+        setTimeout(() => initGoogleOAuth(retryCount + 1), 200);
+        return;
+      }
+    }
+
+    let clientId = FALLBACK_GOOGLE_CLIENT_ID;
     try {
       const res = await fetch(getApiUrl('/api/registration/config'));
-      const config = await res.json();
+      if (res.ok) {
+        const config = await res.json();
+        if (config && config.googleClientId) {
+          clientId = config.googleClientId;
+        }
+      }
+    } catch (cfgErr) {
+      console.warn('Backend config fetch notice, using fallback client ID:', cfgErr);
+    }
 
-      if (window.google && config && config.googleClientId) {
+    try {
+      if (window.google && window.google.accounts && window.google.accounts.id && clientId) {
         window.google.accounts.id.initialize({
-          client_id: config.googleClientId,
+          client_id: clientId,
           callback: (response) => {
             submitGoogleAuth({ credential: response.credential });
           },
@@ -185,6 +205,7 @@
 
         const target = document.getElementById('googleSignInCheckinBtn');
         if (target) {
+          target.innerHTML = '';
           window.google.accounts.id.renderButton(target, {
             theme: 'filled_black',
             size: 'large',

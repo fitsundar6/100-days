@@ -3,15 +3,13 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import prisma from '../lib/prisma';
 import { requireClientAuth, ClientAuthenticatedRequest } from '../middleware/auth';
-import { inMemoryRegisteredClients } from './registration';
+import { inMemoryRegisteredClients, getGoogleClientId } from './registration';
 import { queryWithTimeout } from '../lib/db-safe';
 import { getKolkataDateString } from './attendance';
 
 const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'alphaxgym_dev_jwt_fallback_key';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
-const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // ============================================================
 // 1. CLIENT ME — AUTHENTICATED ATHLETE PROFILE & METRICS
@@ -370,7 +368,7 @@ router.post('/auth/google', async (req: Request, res: Response) => {
     let avatarUrl: string | null = null;
 
     try {
-      const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+      const clientId = getGoogleClientId();
       const oauthClient = new OAuth2Client(clientId);
       const ticket = await oauthClient.verifyIdToken({
         idToken: credential,

@@ -715,8 +715,8 @@
 
               <!-- High Contrast QR Code Frame -->
               <div style="background: #ffffff; padding: 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; margin-bottom: 20px;">
-                <img id="adminRegQrImg" style="width: 240px; height: 240px; display: block; border-radius: 4px;" alt="Client Registration QR" src="https://api.qrserver.com/v1/create-qr-code/?size=500x500&amp;margin=10&amp;data=https%3A%2F%2Fdc07ca2e087e5d.lhr.life%2Fregister" />
-                <div id="adminRegQrLoading" style="display: none; position: absolute; inset: 0; background: rgba(15,17,23,0.92); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                <img id="adminRegQrImg" style="width: 240px; height: 240px; display: block; border-radius: 4px;" alt="Client Registration QR" src="" />
+                <div id="adminRegQrLoading" style="display: flex; position: absolute; inset: 0; background: rgba(15,17,23,0.92); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
                   <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--red);"></i>
                   <span style="font-size: 12px; color: var(--text-muted);">Generating QR...</span>
                 </div>
@@ -745,7 +745,7 @@
                   <i class="fa-solid fa-link"></i> Public Member Registration URL:
                 </label>
                 <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                  <input type="text" id="adminRegUrlInput" class="axg-input" readonly value="https://dc07ca2e087e5d.lhr.life/register" style="font-family: monospace; font-size: 12px;" />
+                  <input type="text" id="adminRegUrlInput" class="axg-input" readonly placeholder="Generating registration URL..." value="" style="font-family: monospace; font-size: 12px;" />
                   <button type="button" class="axg-btn axg-btn--ghost" id="adminRegBtnCopy" title="Copy URL">
                     <i class="fa-solid fa-copy"></i> Copy
                   </button>
@@ -759,7 +759,7 @@
                   <button type="button" class="axg-btn axg-btn--ghost" id="adminRegBtnPrint">
                     <i class="fa-solid fa-print"></i> Print Poster
                   </button>
-                  <a href="https://dc07ca2e087e5d.lhr.life/register" target="_blank" class="axg-btn axg-btn--ghost" id="adminRegBtnOpenPage" style="text-decoration: none; justify-content: center; display: flex; align-items: center; gap: 6px;">
+                  <a href="/register" target="_blank" class="axg-btn axg-btn--ghost" id="adminRegBtnOpenPage" style="text-decoration: none; justify-content: center; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Page
                   </a>
                 </div>

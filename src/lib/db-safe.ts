@@ -8,7 +8,7 @@ let dbLastFailureTime = 0;
 const DB_CIRCUIT_COOLDOWN_MS = 15000; // 15 seconds cooldown before retrying DB
 
 // Production cloud databases (e.g. Render, Supabase, Neon) over SSL need realistic query allowances
-const CONFIG_TIMEOUT_MS = parseInt(process.env.DB_TIMEOUT_MS || '6000', 10) || 6000;
+const CONFIG_TIMEOUT_MS = parseInt(process.env.DB_TIMEOUT_MS || '15000', 10) || 15000;
 
 export function isDatabaseCircuitOpen(): boolean {
   if (dbCircuitOpen) {

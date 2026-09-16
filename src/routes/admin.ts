@@ -222,10 +222,11 @@ router.get('/clients', async (req: AuthenticatedRequest, res: Response) => {
       }
     });
 
+    console.log(`✅ Admin dashboard loaded ${clientSummaries.length} clients directly from PostgreSQL database.`);
     return res.json({ success: true, clients: clientSummaries });
   } catch (error: any) {
-    console.error('Error fetching clients:', error);
-    return res.status(500).json({ success: false, error: 'Failed to retrieve clients list' });
+    console.error('❌ Error fetching clients from PostgreSQL:', error);
+    return res.status(500).json({ success: false, error: 'Failed to retrieve clients list from database' });
   }
 });
 
@@ -494,10 +495,11 @@ router.post('/clients', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
+    console.log(`✅ Admin created new client in PostgreSQL: [${newClient.id}] ${newClient.name} (${newClient.phone})`);
     return res.status(201).json({ success: true, client: newClient });
   } catch (error: any) {
-    console.error('Error creating client:', error);
-    return res.status(500).json({ success: false, error: 'Failed to create client record' });
+    console.error('❌ Error creating client in database:', error);
+    return res.status(500).json({ success: false, error: 'Failed to create client record in database' });
   }
 });
 
@@ -523,10 +525,11 @@ router.put('/clients/:id', async (req: AuthenticatedRequest, res: Response) => {
       },
     });
 
+    console.log(`✅ Admin updated client in PostgreSQL: [${updated.id}] ${updated.name}`);
     return res.json({ success: true, client: updated });
   } catch (error: any) {
-    console.error('Error updating client:', error);
-    return res.status(500).json({ success: false, error: 'Failed to update client' });
+    console.error('❌ Error updating client in database:', error);
+    return res.status(500).json({ success: false, error: 'Failed to update client in database' });
   }
 });
 
@@ -538,10 +541,11 @@ router.delete('/clients/:id', async (req: AuthenticatedRequest, res: Response) =
   try {
     const id = String(req.params.id);
     await prisma.client.delete({ where: { id } });
-    return res.json({ success: true, message: 'Client deleted successfully' });
+    console.log(`✅ Admin deleted client from PostgreSQL: [${id}]`);
+    return res.json({ success: true, message: 'Client deleted successfully from database' });
   } catch (error: any) {
-    console.error('Error deleting client:', error);
-    return res.status(500).json({ success: false, error: 'Failed to delete client' });
+    console.error('❌ Error deleting client from database:', error);
+    return res.status(500).json({ success: false, error: 'Failed to delete client from database' });
   }
 });
 
@@ -576,10 +580,11 @@ router.post('/clients/:id/weight', async (req: AuthenticatedRequest, res: Respon
       data: { currentWeight: parsedWeight },
     });
 
+    console.log(`✅ Admin logged weight in PostgreSQL: Client [${id}], Weight: ${parsedWeight} kg`);
     return res.status(201).json({ success: true, weightLog });
   } catch (error: any) {
-    console.error('Error adding weight log:', error);
-    return res.status(500).json({ success: false, error: 'Failed to save weight record' });
+    console.error('❌ Error adding weight log in database:', error);
+    return res.status(500).json({ success: false, error: 'Failed to save weight record to database' });
   }
 });
 

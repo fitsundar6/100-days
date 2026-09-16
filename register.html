@@ -918,6 +918,16 @@
     (function () {
       'use strict';
 
+      // API Base URL helper
+      function getApiUrl(path) {
+        const isFile = window.location.protocol === 'file:';
+        const isNotPort3000 = window.location.port && window.location.port !== '3000';
+        const base = (isFile || isNotPort3000) ? 'http://localhost:3000' : '';
+        return `${base}${path}`;
+      }
+
+      const FALLBACK_GOOGLE_CLIENT_ID = '661072520427-ntrkjvfob7eptc9fvnaaga087agikupr.apps.googleusercontent.com';
+
       // Elements
       const stepGoogleSignIn = document.getElementById('stepGoogleSignIn');
       const stepVerifying = document.getElementById('stepVerifying');
@@ -997,7 +1007,7 @@
         showStep(stepVerifying);
 
         try {
-          const res = await fetch('/api/registration/auth/google', {
+          const res = await fetch(getApiUrl('/api/registration/auth/google'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -1158,7 +1168,7 @@
         showStep(stepSubmitting);
 
         try {
-          const res = await fetch('/api/registration/submit', {
+          const res = await fetch(getApiUrl('/api/registration/submit'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1181,6 +1191,9 @@
             localStorage.setItem('axg_current_client', JSON.stringify(data.client));
           }
 
+          // Log confirmation of successful database write
+          console.log('✅ Registration successfully saved to database for client:', data.client.name, data.client.id);
+
           // Populate Success Screen
           successAvatar.src = data.client.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
           successName.textContent = data.client.name || 'Alpha Athlete';
@@ -1196,21 +1209,40 @@
           showStep(stepSuccessScreen);
 
         } catch (submitErr) {
-          console.error('Submission error:', submitErr);
-          alert(submitErr.message || 'Submission failed. Please try again.');
+          console.error('❌ Registration database save error:', submitErr);
+          showError(submitErr.message || 'Submission failed. Could not save to database. Please try again.');
+          alert(submitErr.message || 'Submission failed: Could not save to database. Please try again.');
           showStep(stepProfilePreview);
         }
       });
 
-      // Initialize Official Google Identity Services
-      async function initGoogleOAuth() {
-        try {
-          const res = await fetch('/api/registration/config');
-          const config = await res.json();
+      // Initialize Official Google Identity Services with polling and fallback
+      async function initGoogleOAuth(retryCount = 0) {
+        // If Google Identity script is still downloading (async defer), wait and retry
+        if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+          if (retryCount < 25) {
+            setTimeout(() => initGoogleOAuth(retryCount + 1), 200);
+            return;
+          }
+        }
 
-          if (window.google && config && config.googleClientId) {
+        let clientId = FALLBACK_GOOGLE_CLIENT_ID;
+        try {
+          const res = await fetch(getApiUrl('/api/registration/config'));
+          if (res.ok) {
+            const config = await res.json();
+            if (config && config.googleClientId) {
+              clientId = config.googleClientId;
+            }
+          }
+        } catch (cfgErr) {
+          console.warn('Backend config fetch notice (using verified fallback):', cfgErr);
+        }
+
+        try {
+          if (window.google && window.google.accounts && window.google.accounts.id && clientId) {
             window.google.accounts.id.initialize({
-              client_id: config.googleClientId,
+              client_id: clientId,
               callback: (response) => {
                 handleGoogleAuthPayload({ credential: response.credential });
               },
@@ -1220,6 +1252,7 @@
 
             const btnContainer = document.getElementById('googleSignInBtn');
             if (btnContainer) {
+              btnContainer.innerHTML = '';
               window.google.accounts.id.renderButton(
                 btnContainer,
                 {

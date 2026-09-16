@@ -12,6 +12,15 @@
 const STORAGE_KEY = 'axg_clients';
 const WEEKS       = 14;   // 0 (starting) + week 1-14
 
+/** Resolves backend API URL whether running on port 3000, 5500, or static */
+function getApiUrl(path) {
+  const isFile = window.location.protocol === 'file:';
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const isNotPort3000 = window.location.port && window.location.port !== '3000';
+  const base = (isFile || (isLocal && isNotPort3000)) ? 'http://localhost:3000' : '';
+  return `${base}${path}`;
+}
+
 /** Load all clients from localStorage. Returns array. */
 function loadClients() {
   try {
@@ -411,7 +420,7 @@ document.getElementById('inputStartDate').addEventListener('change', function ()
   document.getElementById('datePreview').style.display = 'flex';
 });
 
-function createClient() {
+async function createClient() {
   const name   = document.getElementById('inputClientName').value.trim();
   const phone  = document.getElementById('inputClientPhone').value.trim();
   const weight = parseFloat(document.getElementById('inputStartWeight').value);
@@ -421,46 +430,55 @@ function createClient() {
   if (!weight || weight <= 0) { showToast('Please enter a valid starting weight.', 'error'); return; }
   if (!date)                  { showToast('Please select a start date.', 'error'); return; }
 
-  const { endDate } = calcChallengeDates(date);
-  const weeklyWeights = [weight, ...Array(WEEKS).fill(null)];
+  try {
+    showToast('Saving new client to database...');
+    const res = await fetch(getApiUrl('/api/admin/clients'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        phone,
+        startingWeight: weight,
+        startDate: date,
+      }),
+    });
 
-  const client = {
-    id:             uid(),
-    name:           name,
-    phone:          phone,
-    startingWeight: weight,
-    startDate:      date,
-    endDate:        toInputDate(endDate),
-    weeklyWeights:  weeklyWeights,
-    endingWeight:   null,
-    createdAt:      new Date().toISOString()
-  };
-
-  const clients = loadClients();
-  clients.push(client);
-  saveClients(clients);
-
-  // Save to PostgreSQL via Prisma API
-  fetch('/api/admin/clients', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      phone,
-      startingWeight: weight,
-      startDate: date,
-    }),
-  }).then(r => r.json()).then(d => {
-    if (d.success && d.client) {
-      client.id = d.client.id;
-      saveClients(loadClients());
+    const d = await res.json();
+    if (!res.ok || !d.success || !d.client) {
+      throw new Error(d.error || 'Failed to save client to database.');
     }
-  }).catch(err => console.warn('Could not save client to DB:', err));
 
-  closeAddModal();
-  renderTable();
-  updateStats();
-  showToast(`${name}'s 100-day challenge created!`);
+    const { endDate } = calcChallengeDates(date);
+    const weeklyWeights = [weight, ...Array(WEEKS).fill(null)];
+
+    const client = {
+      id:             d.client.id,
+      name:           d.client.name || name,
+      phone:          d.client.phone || phone,
+      email:          d.client.email || '',
+      startingWeight: weight,
+      currentWeight:  weight,
+      startDate:      date,
+      endDate:        toInputDate(endDate),
+      weeklyWeights:  weeklyWeights,
+      endingWeight:   null,
+      createdAt:      d.client.createdAt || new Date().toISOString()
+    };
+
+    const clients = loadClients();
+    clients.unshift(client);
+    saveClients(clients);
+
+    closeAddModal();
+    renderTable();
+    updateStats();
+    console.log(`✅ Client successfully saved to database: [${client.id}] ${client.name}`);
+    showToast(`${name}'s 100-day challenge created and saved to database!`);
+  } catch (err) {
+    console.error('❌ Failed to save client to database:', err);
+    showToast(`Error: ${err.message || 'Could not save client to database.'}`, 'error');
+    alert(`Could not save client to database: ${err.message}`);
+  }
 }
 
 
@@ -579,7 +597,7 @@ function openClientDetail(clientId) {
   document.getElementById('clientDetailModal').style.display = 'flex';
 
   // Fetch live client details and 100-day completion matrix from PostgreSQL
-  fetch('/api/admin/clients/' + clientId)
+  fetch(getApiUrl('/api/admin/clients/' + clientId))
     .then(r => r.json())
     .then(d => {
       if (d.success && d.client) {
@@ -801,7 +819,7 @@ function renderWeeklyCheckins(client) {
   });
 }
 
-function saveWeeklyWeight(weekIndex, rawValue) {
+async function saveWeeklyWeight(weekIndex, rawValue) {
   if (rawValue === '' || rawValue === null) {
     showToast('Please enter a weight value.', 'error');
     return;
@@ -817,13 +835,34 @@ function saveWeeklyWeight(weekIndex, rawValue) {
   const client  = clients.find(c => c.id === activeClientId);
   if (!client) return;
 
-  client.weeklyWeights[weekIndex] = round1(weight);
-  saveClients(clients);
+  try {
+    const res = await fetch(getApiUrl(`/api/admin/clients/${activeClientId}/weight`), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        weight: round1(weight),
+        note: `Week ${weekIndex} Check-in`,
+      }),
+    });
 
-  showToast(`Week ${weekIndex} weight saved — ${round1(weight)} kg`);
-  openClientDetail(activeClientId);
-  renderTable();
-  updateStats();
+    const d = await res.json();
+    if (!res.ok || !d.success) {
+      throw new Error(d.error || 'Failed to save weight to database');
+    }
+
+    client.weeklyWeights[weekIndex] = round1(weight);
+    client.currentWeight = round1(weight);
+    saveClients(clients);
+
+    console.log(`✅ Week ${weekIndex} weight (${round1(weight)} kg) saved to database for client:`, activeClientId);
+    showToast(`Week ${weekIndex} weight saved to database — ${round1(weight)} kg`);
+    openClientDetail(activeClientId);
+    renderTable();
+    updateStats();
+  } catch (err) {
+    console.error('❌ Database error saving weight:', err);
+    showToast(`Could not save weight to database: ${err.message}`, 'error');
+  }
 }
 
 
@@ -831,7 +870,7 @@ function saveWeeklyWeight(weekIndex, rawValue) {
    9. ENDING WEIGHT
    ============================================================ */
 
-function saveEndingWeight() {
+async function saveEndingWeight() {
   const val = document.getElementById('inputEndingWeight').value;
   if (!val) { showToast('Please enter an ending weight.', 'error'); return; }
 
@@ -842,13 +881,32 @@ function saveEndingWeight() {
   const client  = clients.find(c => c.id === activeClientId);
   if (!client) return;
 
-  client.endingWeight = round1(weight);
-  saveClients(clients);
+  try {
+    const res = await fetch(getApiUrl(`/api/admin/clients/${activeClientId}`), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetWeight: round1(weight),
+      }),
+    });
 
-  showToast(`Ending weight saved — ${round1(weight)} kg`);
-  openClientDetail(activeClientId);
-  renderTable();
-  updateStats();
+    const d = await res.json();
+    if (!res.ok || !d.success) {
+      throw new Error(d.error || 'Failed to save ending weight to database');
+    }
+
+    client.endingWeight = round1(weight);
+    saveClients(clients);
+
+    console.log(`✅ Ending weight (${round1(weight)} kg) saved to database for client:`, activeClientId);
+    showToast(`Ending weight saved to database — ${round1(weight)} kg`);
+    openClientDetail(activeClientId);
+    renderTable();
+    updateStats();
+  } catch (err) {
+    console.error('❌ Database error saving ending weight:', err);
+    showToast(`Could not save ending weight: ${err.message}`, 'error');
+  }
 }
 
 
@@ -976,7 +1034,7 @@ document.getElementById('editStartDate').addEventListener('change', function () 
   document.getElementById('editDatePreview').style.display = 'flex';
 });
 
-function saveEditClient() {
+async function saveEditClient() {
   const name   = document.getElementById('editClientName').value.trim();
   const phone  = document.getElementById('editClientPhone').value.trim();
   const weight = parseFloat(document.getElementById('editStartWeight').value);
@@ -990,37 +1048,58 @@ function saveEditClient() {
   const client  = clients.find(c => c.id === activeClientId);
   if (!client) return;
 
-  const dateChanged   = client.startDate !== date;
-  const weightChanged = client.startingWeight !== weight;
+  try {
+    const res = await fetch(getApiUrl(`/api/admin/clients/${activeClientId}`), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        phone,
+        startingWeight: weight,
+      }),
+    });
 
-  client.name           = name;
-  client.phone          = phone;
-  client.startingWeight = weight;
-  client.startDate      = date;
+    const d = await res.json();
+    if (!res.ok || !d.success) {
+      throw new Error(d.error || 'Failed to update client in database');
+    }
 
-  const { endDate } = calcChallengeDates(date);
-  client.endDate    = toInputDate(endDate);
+    const dateChanged   = client.startDate !== date;
+    const weightChanged = client.startingWeight !== weight;
 
-  if (dateChanged) {
-    client.weeklyWeights = [weight, ...Array(WEEKS).fill(null)];
-    delete client.dailyCheckins;
-    showToast('Start date changed — weekly weights and attendance reset.');
+    client.name           = name;
+    client.phone          = phone;
+    client.startingWeight = weight;
+    client.startDate      = date;
+
+    const { endDate } = calcChallengeDates(date);
+    client.endDate    = toInputDate(endDate);
+
+    if (dateChanged) {
+      client.weeklyWeights = [weight, ...Array(WEEKS).fill(null)];
+      delete client.dailyCheckins;
+      showToast('Start date changed — weekly weights and attendance reset.');
+    }
+
+    if (weightChanged && !dateChanged) {
+      client.weeklyWeights[0] = weight;
+    }
+
+    saveClients(clients);
+    closeEditModal();
+    renderTable();
+    updateStats();
+
+    if (document.getElementById('clientDetailModal').style.display !== 'none') {
+      openClientDetail(activeClientId);
+    }
+
+    console.log(`✅ Client updated in database:`, activeClientId, name);
+    showToast(`${name}'s profile updated in database.`);
+  } catch (err) {
+    console.error('❌ Failed to update client in database:', err);
+    showToast(`Could not update client: ${err.message}`, 'error');
   }
-
-  if (weightChanged && !dateChanged) {
-    client.weeklyWeights[0] = weight;
-  }
-
-  saveClients(clients);
-  closeEditModal();
-  renderTable();
-  updateStats();
-
-  if (document.getElementById('clientDetailModal').style.display !== 'none') {
-    openClientDetail(activeClientId);
-  }
-
-  showToast(`${name}'s profile updated.`);
 }
 
 
@@ -1042,21 +1121,37 @@ function closeDeleteModal() {
   document.getElementById('deleteConfirmModal').style.display = 'none';
 }
 
-function deleteClient() {
-  let clients = loadClients();
-  clients     = clients.filter(c => c.id !== activeClientId);
-  saveClients(clients);
+async function deleteClient() {
+  const clientId = activeClientId;
+  try {
+    const res = await fetch(getApiUrl(`/api/admin/clients/${clientId}`), {
+      method: 'DELETE',
+    });
 
-  closeDeleteModal();
+    const d = await res.json();
+    if (!res.ok || !d.success) {
+      throw new Error(d.error || 'Failed to delete client from database');
+    }
 
-  if (document.getElementById('clientDetailModal').style.display !== 'none') {
-    closeClientDetailModal();
+    let clients = loadClients();
+    clients     = clients.filter(c => c.id !== clientId);
+    saveClients(clients);
+
+    closeDeleteModal();
+
+    if (document.getElementById('clientDetailModal').style.display !== 'none') {
+      closeClientDetailModal();
+    }
+
+    renderTable();
+    updateStats();
+    console.log(`✅ Client successfully deleted from database:`, clientId);
+    showToast('Client deleted from database.');
+    activeClientId = null;
+  } catch (err) {
+    console.error('❌ Failed to delete client from database:', err);
+    showToast(`Could not delete client: ${err.message}`, 'error');
   }
-
-  renderTable();
-  updateStats();
-  showToast('Client deleted.');
-  activeClientId = null;
 }
 
 
@@ -1424,40 +1519,45 @@ function updateAttendanceStats(checkins) {
 
 async function syncFromPostgres() {
   try {
-    const res = await fetch('/api/admin/clients');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && Array.isArray(data.clients)) {
-        const local = loadClients();
-        const merged = data.clients.map(c => {
-          const lMatch = local.find(l => l.id === c.id || l.phone === c.phone || (c.email && l.email === c.email));
-          return {
-            id: c.id,
-            name: c.name,
-            phone: c.phone || lMatch?.phone || '',
-            email: c.email || '',
-            avatarUrl: c.avatarUrl || lMatch?.avatarUrl || null,
-            status: c.status || lMatch?.status || 'Active',
-            startingWeight: c.startingWeight || lMatch?.startingWeight || 0,
-            endingWeight: c.endingWeight || lMatch?.endingWeight || null,
-            currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight || 0,
-            targetWeight: c.targetWeight || lMatch?.targetWeight || null,
-            startDate: lMatch?.startDate || toInputDate(c.registeredAt || c.createdAt || new Date()),
-            endDate: lMatch?.endDate || toInputDate(addDays(c.registeredAt || c.createdAt || new Date(), 99)),
-            weeklyWeights: c.weeklyWeights || lMatch?.weeklyWeights || [c.startingWeight],
-            dailyCheckins: lMatch?.dailyCheckins || [],
-            registeredAt: c.registeredAt || lMatch?.registeredAt || c.createdAt || new Date().toISOString(),
-            formattedJoinedDate: c.formattedJoinedDate || lMatch?.formattedJoinedDate || fmtDate(c.registeredAt || c.createdAt),
-            createdAt: c.createdAt || new Date().toISOString(),
-          };
-        });
-        saveClients(merged);
-        renderTable();
-        updateStats();
-      }
+    const res = await fetch(getApiUrl('/api/admin/clients'));
+    if (!res.ok) {
+      throw new Error(`Server returned HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    if (data.success && Array.isArray(data.clients)) {
+      const local = loadClients();
+      const merged = data.clients.map(c => {
+        const lMatch = local.find(l => l.id === c.id || l.phone === c.phone || (c.email && l.email === c.email));
+        return {
+          id: c.id,
+          name: c.name,
+          phone: c.phone || lMatch?.phone || '',
+          email: c.email || '',
+          avatarUrl: c.avatarUrl || lMatch?.avatarUrl || null,
+          status: c.status || lMatch?.status || 'Active',
+          startingWeight: c.startingWeight || lMatch?.startingWeight || 0,
+          endingWeight: c.endingWeight || lMatch?.endingWeight || null,
+          currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight || 0,
+          targetWeight: c.targetWeight || lMatch?.targetWeight || null,
+          startDate: lMatch?.startDate || toInputDate(c.registeredAt || c.createdAt || new Date()),
+          endDate: lMatch?.endDate || toInputDate(addDays(c.registeredAt || c.createdAt || new Date(), 99)),
+          weeklyWeights: c.weeklyWeights || lMatch?.weeklyWeights || [c.startingWeight],
+          dailyCheckins: lMatch?.dailyCheckins || [],
+          registeredAt: c.registeredAt || lMatch?.registeredAt || c.createdAt || new Date().toISOString(),
+          formattedJoinedDate: c.formattedJoinedDate || lMatch?.formattedJoinedDate || fmtDate(c.registeredAt || c.createdAt),
+          createdAt: c.createdAt || new Date().toISOString(),
+        };
+      });
+      saveClients(merged);
+      renderTable();
+      updateStats();
+      console.log(`✅ Admin dashboard loaded ${merged.length} client(s) from database on page load.`);
+    } else {
+      throw new Error(data.error || 'Invalid response from database');
     }
   } catch (e) {
-    console.warn('PostgreSQL sync offline fallback:', e);
+    console.warn('PostgreSQL sync notice:', e);
+    showToast('Note: Offline/local cache active. Could not reach PostgreSQL database.', 'error');
   }
 }
 
@@ -1470,7 +1570,7 @@ const notifiedClientIds = new Set();
 
 async function pollNewRegistrations() {
   try {
-    const url = `/api/admin/notifications/registrations?since=${encodeURIComponent(lastRegistrationCheck)}`;
+    const url = getApiUrl(`/api/admin/notifications/registrations?since=${encodeURIComponent(lastRegistrationCheck)}`);
     const res = await fetch(url);
     if (!res.ok) return;
     const data = await res.json();
