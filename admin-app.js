@@ -14,15 +14,67 @@ const WEEKS       = 14;   // 0 (starting) + week 1-14
 
 /** Resolves backend API URL whether running on port 3000, 5500, or static */
 function getApiUrl(path) {
-  const isFile = window.location.protocol === 'file:';
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const isNotPort3000 = window.location.port && window.location.port !== '3000';
-  const base = (isFile || (isLocal && isNotPort3000)) ? 'http://localhost:3000' : '';
-  return `${base}${path}`;
+  if (window.location.protocol === 'file:') return `http://localhost:3000${path}`;
+  if (window.location.port && window.location.port !== '3000') {
+    return `http://${window.location.hostname || 'localhost'}:3000${path}`;
+  }
+  return path;
 }
 
-/** Load all clients from localStorage. Returns array. */
+/**
+ * REACTIVE CLIENT STATE STORE
+ * Mimicking React's useState pattern for state updates and subscriptions.
+ */
+const ClientState = {
+  clients: [],
+  status: 'loading', // 'loading' | 'success' | 'error'
+  error: null,
+  filter: 'all',
+  search: '',
+  listeners: [],
+
+  getState() {
+    return {
+      clients: this.clients,
+      status: this.status,
+      error: this.error,
+      filter: this.filter,
+      search: this.search,
+    };
+  },
+
+  setState(updates) {
+    Object.assign(this, updates);
+    if (updates.clients !== undefined) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.clients));
+      } catch (e) {
+        console.warn('Could not cache clients to localStorage:', e);
+      }
+    }
+    this.notify();
+  },
+
+  subscribe(listener) {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  },
+
+  notify() {
+    const s = this.getState();
+    this.listeners.forEach(fn => {
+      try { fn(s); } catch (err) { console.error('State subscriber error:', err); }
+    });
+  }
+};
+
+/** Load all clients. Returns reactive state array if available, else localStorage. */
 function loadClients() {
+  if (ClientState && Array.isArray(ClientState.clients) && ClientState.clients.length > 0) {
+    return ClientState.clients;
+  }
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   } catch {
@@ -30,9 +82,16 @@ function loadClients() {
   }
 }
 
-/** Save all clients array to localStorage. */
+/** Save all clients array to localStorage and sync reactive state. */
 function saveClients(clients) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+  if (ClientState) {
+    ClientState.clients = clients;
+  }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+  } catch (e) {
+    console.warn('Could not save clients:', e);
+  }
 }
 
 /** Generate a simple unique ID. */
@@ -146,8 +205,8 @@ function calcChallengeDay(startDateStr) {
 }
 
 function getCurrentWeight(client) {
-  if (client.endingWeight !== null && client.endingWeight !== undefined && client.endingWeight !== '') {
-    return parseFloat(client.endingWeight);
+  if (client.currentWeight !== null && client.currentWeight !== undefined && client.currentWeight !== '') {
+    return parseFloat(client.currentWeight);
   }
 
   const weights = client.weeklyWeights || [];
@@ -157,8 +216,8 @@ function getCurrentWeight(client) {
     }
   }
 
-  if (client.currentWeight !== null && client.currentWeight !== undefined && client.currentWeight !== '') {
-    return parseFloat(client.currentWeight);
+  if (client.endingWeight !== null && client.endingWeight !== undefined && client.endingWeight !== '') {
+    return parseFloat(client.endingWeight);
   }
 
   return client.startingWeight;
@@ -198,58 +257,97 @@ function updateStats() {
     }
   });
 
-  document.getElementById('statTotalClients').textContent     = clients.length;
-  document.getElementById('statActiveClients').textContent    = active;
-  document.getElementById('statCompletedClients').textContent = completed;
-
+  const elTotal = document.getElementById('statTotalClients');
+  const elActive = document.getElementById('statActiveClients');
+  const elCompleted = document.getElementById('statCompletedClients');
   const avgEl = document.getElementById('statAvgChange');
-  if (changeCount > 0) {
-    const avg = round1(totalChange / changeCount);
-    avgEl.textContent = fmtChange(avg);
-    avgEl.style.color = avg <= 0 ? 'var(--green)' : 'var(--red)';
-  } else {
-    avgEl.textContent = '— kg';
-    avgEl.style.color = '';
+
+  if (elTotal) elTotal.textContent = clients.length;
+  if (elActive) elActive.textContent = active;
+  if (elCompleted) elCompleted.textContent = completed;
+
+  if (avgEl) {
+    if (changeCount > 0) {
+      const avg = round1(totalChange / changeCount);
+      avgEl.textContent = fmtChange(avg);
+      avgEl.style.color = avg <= 0 ? 'var(--green)' : 'var(--red)';
+    } else {
+      avgEl.textContent = '— kg';
+      avgEl.style.color = '';
+    }
   }
 }
 
 
 /* ============================================================
-   4. CLIENT TABLE RENDERING
+   4. CLIENT TABLE RENDERING (REACTIVE TO CLIENTSTATE)
    ============================================================ */
 
 let currentFilter = 'all';
 let currentSearch = '';
 
 function renderTable() {
-  const clients = loadClients();
+  const state = ClientState.getState();
+  const { clients, status, error, filter, search } = state;
 
-  let filtered = clients.filter(c => {
-    const term = currentSearch.toLowerCase();
-    const matchName  = c.name ? c.name.toLowerCase().includes(term) : false;
-    const matchPhone = c.phone ? c.phone.includes(term) : false;
-    const matchEmail = c.email ? c.email.toLowerCase().includes(term) : false;
-    if (!matchName && !matchPhone && !matchEmail) return false;
+  const loadingEl = document.getElementById('clientTableLoading');
+  const errorEl   = document.getElementById('clientTableError');
+  const errorMsg  = document.getElementById('clientTableErrorMessage');
+  const emptyEl   = document.getElementById('emptyState');
+  const wrapEl    = document.getElementById('clientTableWrap');
+  const tbody     = document.getElementById('clientTableBody');
 
-    if (currentFilter === 'all') return true;
-    const { status } = calcChallengeDay(c.startDate);
-    return status === currentFilter;
-  });
+  if (!tbody || !wrapEl || !emptyEl) return;
 
-  const tbody = document.getElementById('clientTableBody');
-  const wrap  = document.getElementById('clientTableWrap');
-  const empty = document.getElementById('emptyState');
-
-  tbody.innerHTML = '';
-
-  if (clients.length === 0) {
-    wrap.style.display  = 'none';
-    empty.style.display = '';
+  // 1. Loading state
+  if (status === 'loading') {
+    if (loadingEl) loadingEl.style.display = '';
+    if (errorEl)   errorEl.style.display   = 'none';
+    emptyEl.style.display                  = 'none';
+    wrapEl.style.display                   = 'none';
     return;
   }
 
-  wrap.style.display  = '';
-  empty.style.display = 'none';
+  // 2. Error state (shown if backend connection failed and no cached clients)
+  if (status === 'error' && clients.length === 0) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (errorEl)   errorEl.style.display   = '';
+    if (errorMsg && error) {
+      errorMsg.textContent = `Could not reach database (${error}). Click below to reconnect.`;
+    }
+    emptyEl.style.display = 'none';
+    wrapEl.style.display  = 'none';
+    return;
+  }
+
+  // 3. Ready / Success state
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (errorEl)   errorEl.style.display   = 'none';
+
+  if (clients.length === 0) {
+    wrapEl.style.display  = 'none';
+    emptyEl.style.display = '';
+    return;
+  }
+
+  wrapEl.style.display  = '';
+  emptyEl.style.display = 'none';
+
+  const activeFilter = filter || currentFilter || 'all';
+  const activeSearch = (search !== undefined ? search : currentSearch || '').toLowerCase();
+
+  let filtered = clients.filter(c => {
+    const matchName  = c.name ? c.name.toLowerCase().includes(activeSearch) : false;
+    const matchPhone = c.phone ? c.phone.includes(activeSearch) : false;
+    const matchEmail = c.email ? c.email.toLowerCase().includes(activeSearch) : false;
+    if (!matchName && !matchPhone && !matchEmail) return false;
+
+    if (activeFilter === 'all') return true;
+    const { status: dayStatus } = calcChallengeDay(c.startDate);
+    return dayStatus === activeFilter;
+  });
+
+  tbody.innerHTML = '';
 
   if (filtered.length === 0) {
     tbody.innerHTML = `
@@ -465,13 +563,11 @@ async function createClient() {
       createdAt:      d.client.createdAt || new Date().toISOString()
     };
 
-    const clients = loadClients();
-    clients.unshift(client);
-    saveClients(clients);
+    const currentList = Array.isArray(ClientState.clients) ? ClientState.clients : loadClients();
+    const updatedList = [client, ...currentList.filter(c => c.id !== client.id)];
+    ClientState.setState({ clients: updatedList, status: 'success' });
 
     closeAddModal();
-    renderTable();
-    updateStats();
     console.log(`✅ Client successfully saved to database: [${client.id}] ${client.name}`);
     showToast(`${name}'s 100-day challenge created and saved to database!`);
   } catch (err) {
@@ -1159,17 +1255,20 @@ async function deleteClient() {
    13. SEARCH & FILTER
    ============================================================ */
 
-document.getElementById('searchInput').addEventListener('input', function () {
-  currentSearch = this.value;
-  renderTable();
-});
+const searchInputEl = document.getElementById('searchInput');
+if (searchInputEl) {
+  searchInputEl.addEventListener('input', function () {
+    currentSearch = this.value;
+    ClientState.setState({ search: this.value });
+  });
+}
 
 document.querySelectorAll('.axg-filter-tab').forEach(tab => {
   tab.addEventListener('click', function () {
     document.querySelectorAll('.axg-filter-tab').forEach(t => t.classList.remove('axg-filter-tab--active'));
     this.classList.add('axg-filter-tab--active');
-    currentFilter = this.dataset.filter;
-    renderTable();
+    currentFilter = this.dataset.filter || 'all';
+    ClientState.setState({ filter: this.dataset.filter || 'all' });
   });
 });
 
@@ -1517,7 +1616,18 @@ function updateAttendanceStats(checkins) {
    16. INITIALISE ON PAGE LOAD
    ============================================================ */
 
-async function syncFromPostgres() {
+/* ============================================================
+   16. MOUNT DATA FETCH EFFECT (USEEFFECT EQUIVALENT)
+   ============================================================ */
+
+/**
+ * Lifecycle Fetch Effect: equivalent to React's useEffect(() => { fetchClients(); }, [])
+ * Fetches clients from PostgreSQL, merges with cache, updates ClientState (useState),
+ * and triggers automated re-rendering of table and KPIs.
+ */
+async function fetchClientsEffect() {
+  ClientState.setState({ status: 'loading', error: null });
+
   try {
     const res = await fetch(getApiUrl('/api/admin/clients'));
     if (!res.ok) {
@@ -1534,7 +1644,7 @@ async function syncFromPostgres() {
           phone: c.phone || lMatch?.phone || '',
           email: c.email || '',
           avatarUrl: c.avatarUrl || lMatch?.avatarUrl || null,
-          status: c.status || lMatch?.status || 'Active',
+          status: c.status || lMatch?.status || 'active',
           startingWeight: c.startingWeight || lMatch?.startingWeight || 0,
           endingWeight: c.endingWeight || lMatch?.endingWeight || null,
           currentWeight: c.currentWeight || c.endingWeight || lMatch?.currentWeight || c.startingWeight || 0,
@@ -1548,18 +1658,39 @@ async function syncFromPostgres() {
           createdAt: c.createdAt || new Date().toISOString(),
         };
       });
-      saveClients(merged);
-      renderTable();
-      updateStats();
-      console.log(`✅ Admin dashboard loaded ${merged.length} client(s) from database on page load.`);
+
+      ClientState.setState({
+        clients: merged,
+        status: 'success',
+        error: null
+      });
+      console.log(`✅ [useEffect] Reactively loaded ${merged.length} client(s) from database into state.`);
     } else {
       throw new Error(data.error || 'Invalid response from database');
     }
   } catch (e) {
     console.warn('PostgreSQL sync notice:', e);
-    showToast('Note: Offline/local cache active. Could not reach PostgreSQL database.', 'error');
+    const cached = loadClients();
+    if (cached && cached.length > 0) {
+      ClientState.setState({
+        clients: cached,
+        status: 'success',
+        error: null
+      });
+      showToast('Loaded clients from local cache (backend offline).', 'error');
+    } else {
+      ClientState.setState({
+        clients: [],
+        status: 'error',
+        error: e.message || 'Could not reach PostgreSQL database'
+      });
+      showToast('Could not reach PostgreSQL database.', 'error');
+    }
   }
 }
+
+// Alias for backwards compatibility
+const syncFromPostgres = fetchClientsEffect;
 
 /* ============================================================
    17. REAL-TIME REGISTRATION NOTIFICATIONS POLLING
@@ -1585,7 +1716,7 @@ async function pollNewRegistrations() {
         }
       }
       if (hasNew) {
-        syncFromPostgres();
+        fetchClientsEffect();
       }
     }
   } catch (err) {
@@ -1637,11 +1768,34 @@ function showRegistrationToast(client) {
 }
 
 function init() {
+  // Subscribe UI renders to state changes (reactive pattern)
+  ClientState.subscribe(() => {
+    renderTable();
+    updateStats();
+  });
+
+  // Attach retry button handler
+  const retryBtn = document.getElementById('retryFetchClientsBtn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      fetchClientsEffect();
+    });
+  }
+
+  // Initial paint (renders skeleton loading state)
   renderTable();
   updateStats();
-  syncFromPostgres();
+
+  // Trigger lifecycle fetch effect
+  fetchClientsEffect();
+
   // Poll new registrations every 8 seconds
   setInterval(pollNewRegistrations, 8000);
 }
+
+// Expose to window for global access and testing
+window.ClientState = ClientState;
+window.fetchClientsEffect = fetchClientsEffect;
 
 init();

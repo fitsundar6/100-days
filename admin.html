@@ -246,8 +246,65 @@
         ----------------------------------------------- -->
         <section class="axg-table-section" id="clientsSection">
 
+          <!-- Loading Skeleton State (shown while fetching clients from PostgreSQL) -->
+          <div class="axg-table-loading-container" id="clientTableLoading" style="display:none;">
+            <div class="axg-loading-badge-wrap">
+              <span class="axg-loading-spinner"></span>
+              <span>Syncing athlete roster from database...</span>
+            </div>
+            <table class="axg-skeleton-table">
+              <tbody>
+                <tr>
+                  <td style="width:52px;"><div class="axg-skeleton-bar axg-skeleton-avatar"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:140px; height:18px; margin-bottom:6px;"></div><br/><div class="axg-skeleton-bar" style="width:90px; height:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:160px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:80px; height:16px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:70px; height:22px; border-radius:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:100px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:120px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:80px; height:28px; border-radius:6px;"></div></td>
+                </tr>
+                <tr>
+                  <td style="width:52px;"><div class="axg-skeleton-bar axg-skeleton-avatar"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:160px; height:18px; margin-bottom:6px;"></div><br/><div class="axg-skeleton-bar" style="width:100px; height:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:180px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:85px; height:16px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:70px; height:22px; border-radius:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:100px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:120px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:80px; height:28px; border-radius:6px;"></div></td>
+                </tr>
+                <tr>
+                  <td style="width:52px;"><div class="axg-skeleton-bar axg-skeleton-avatar"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:130px; height:18px; margin-bottom:6px;"></div><br/><div class="axg-skeleton-bar" style="width:80px; height:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:150px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:75px; height:16px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:70px; height:22px; border-radius:12px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:100px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:120px; height:14px;"></div></td>
+                  <td><div class="axg-skeleton-bar" style="width:80px; height:28px; border-radius:6px;"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Error Fallback State (shown when backend API cannot be reached) -->
+          <div class="axg-table-error-card" id="clientTableError" style="display:none;">
+            <div class="axg-table-error-card__icon">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="axg-table-error-card__title">Unable to Connect to Database</h3>
+            <p class="axg-table-error-card__desc" id="clientTableErrorMessage">
+              Could not retrieve the athlete list from PostgreSQL backend. Please ensure the backend server is running on port 3000.
+            </p>
+            <button type="button" class="axg-table-error-card__btn" id="retryFetchClientsBtn">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>Retry Connecting to Database</span>
+            </button>
+          </div>
+
           <!-- Empty State (shown when zero clients exist) -->
-          <div class="axg-empty-state" id="emptyState">
+          <div class="axg-empty-state" id="emptyState" style="display:none;">
             <div class="axg-empty-state__icon-box">
               <i class="fa-solid fa-dumbbell axg-empty-state__icon"></i>
             </div>
