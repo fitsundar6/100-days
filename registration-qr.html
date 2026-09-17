@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alpha X Gym — Client Registration QR</title>
-  <meta name="description" content="Alpha X Gym official member registration QR terminal. Scan with any mobile device to create your athlete profile." />
+  <meta name="description"
+    content="Alpha X Gym official member registration QR terminal. Scan with any mobile device to create your athlete profile." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
     :root {
@@ -35,7 +39,7 @@
 
     body {
       background-color: var(--bg-base);
-      background-image: 
+      background-image:
         radial-gradient(circle at 50% 10%, rgba(225, 29, 72, 0.12) 0%, transparent 60%),
         radial-gradient(circle at 10% 90%, rgba(225, 29, 72, 0.05) 0%, transparent 50%);
       color: var(--text-pure);
@@ -248,7 +252,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Target URL Pill Box */
@@ -387,8 +393,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Print Stylesheet for A4 Gym Poster */
@@ -460,6 +473,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- ==============================================
@@ -500,7 +514,8 @@
 
       <h1 class="qr-card-title">SCAN TO JOIN<br /><span>ALPHA X GYM</span></h1>
       <p class="qr-card-subtitle">
-        Scan this QR with your smartphone camera to create your official member profile, enter starting weight, and join our fitness protocol.
+        Scan this QR with your smartphone camera to create your official member profile, enter starting weight, and join
+        our fitness protocol.
       </p>
 
       <!-- Large QR Code Frame -->
@@ -536,7 +551,8 @@
       <!-- Print Poster Footer (Visible only during printing) -->
       <div class="print-poster-footer">
         <p>Alpha X Gym • Official Member Onboarding</p>
-        <p style="font-size: 12px; color: #555; margin-top: 4px;" id="printUrlDisplay">https://alphaxgym.com/register</p>
+        <p style="font-size: 12px; color: #555; margin-top: 4px;" id="printUrlDisplay">https://alphaxgym.com/register
+        </p>
       </div>
 
     </div>
@@ -702,9 +718,9 @@
       // Fullscreen
       btnFullscreen.addEventListener('click', () => {
         if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
+          document.documentElement.requestFullscreen().catch(() => { });
         } else {
-          document.exitFullscreen().catch(() => {});
+          document.exitFullscreen().catch(() => { });
         }
       });
 
@@ -714,4 +730,5 @@
     })();
   </script>
 </body>
+
 </html>
